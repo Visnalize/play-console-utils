@@ -43,3 +43,14 @@ pnpm lint         # eslint
 pnpm format       # prettier --write
 pnpm test         # vitest
 ```
+
+## Releasing
+
+Pushing a tag matching `v*` (e.g. `v1.1.0`) triggers [`.github/workflows/release.yml`](.github/workflows/release.yml), which type-checks, lints, and tests the project, sets `package.json`'s version to match the tag, builds & zips both the Chrome and Firefox extensions, and publishes them as assets on a GitHub Release (auto-generated release notes from commits/PRs since the last tag).
+
+```sh
+git tag v1.1.0
+git push origin v1.1.0
+```
+
+`package.json`'s `version` is the single source of truth for the extension version — `wxt.config.ts` intentionally has no `version` field, so the built manifest always reflects it (and the release workflow keeps it in sync with the tag).

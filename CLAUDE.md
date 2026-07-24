@@ -32,7 +32,7 @@ First-time setup on a fresh checkout may need `pnpm approve-builds` if pnpm bloc
 
 ### Manifest is generated, never hand-edited
 
-There is no `manifest.json` in the repo. WXT generates it at build time from `wxt.config.ts` (top-level fields: name, description, version, permissions, icons, action) plus whatever each entrypoint declares (`content_scripts.matches` comes from `defineContentScript({ matches })`; `options_ui` is auto-detected from `entrypoints/options/`). Don't add a manifest field in `wxt.config.ts` that an entrypoint already declares — that causes duplication/drift.
+There is no `manifest.json` in the repo. WXT generates it at build time from `wxt.config.ts` (top-level fields: name, description, permissions, icons, action) plus whatever each entrypoint declares (`content_scripts.matches` comes from `defineContentScript({ matches })`; `options_ui` is auto-detected from `entrypoints/options/`). `manifest.version` is deliberately *not* set in `wxt.config.ts` — WXT falls back to `package.json`'s `version` field, which is the single source of truth (bumped directly, or via the release workflow from a pushed tag; see README's Releasing section). Don't add a manifest field in `wxt.config.ts` that an entrypoint already declares, or re-add an explicit `version`, — that causes duplication/drift.
 
 ### One content-script entrypoint, two feature modules
 
@@ -52,7 +52,7 @@ Two modules under `utils/` define storage schemas via `@wxt-dev/storage`'s `stor
 - `utils/app-mapping.ts` — `local:appMappings`: array of `{label, slug}`. `resolveAppSlug()` tries exact label match, then substring match (preserving the original `.includes()`-style fuzzy behavior), then falls back to auto-slugifying the raw label. No mapping is pre-seeded on install.
 - `utils/shortcuts.ts` — `local:quickReplyShortcut` (modifiers + a trigger key, default Ctrl/⌘+Enter) and `local:parseReviewModifier` (modifiers only, default Alt). Matching is **exact** on every modifier flag — a deliberate tightening vs. the original hardcoded checks, necessary so distinct configured combos don't collide.
 
-Content scripts load the current value on init *and* call `.watch(...)` on the storage item so options-page edits apply live without a page reload — don't reintroduce a load-once pattern here.
+Content scripts load the current value on init _and_ call `.watch(...)` on the storage item so options-page edits apply live without a page reload — don't reintroduce a load-once pattern here.
 
 ### Options page (Vue)
 

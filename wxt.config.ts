@@ -6,7 +6,6 @@ export default defineConfig({
     name: 'Play Console Utils',
     description:
       'Quick-reply and review-parsing shortcuts for the Google Play Console.',
-    version: '1.0.0',
     permissions: ['storage'],
     icons: {
       16: '/icons/icon16.png',
