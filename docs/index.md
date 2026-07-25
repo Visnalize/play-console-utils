@@ -8,4 +8,4 @@ head:
 
 # Play Console Utils
 
-Redirecting to the [privacy policy](/privacy/).
+Redirecting to the [privacy policy](/privacy).
