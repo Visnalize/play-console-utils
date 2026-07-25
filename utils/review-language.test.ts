@@ -9,9 +9,9 @@ describe('extractTargetLanguageCode', () => {
   });
 
   it('trims surrounding whitespace before matching', () => {
-    expect(
-      extractTargetLanguageCode('  Translated from Spanish -  '),
-    ).toBe('es');
+    expect(extractTargetLanguageCode('  Translated from Spanish -  ')).toBe(
+      'es',
+    );
   });
 
   it('returns null when there is no banner', () => {

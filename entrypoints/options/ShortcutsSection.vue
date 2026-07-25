@@ -36,14 +36,13 @@
 
     <div class="shortcut-row">
       <label
-        ><input v-model="autoTranslateReply" type="checkbox" /> Translate
-        reply to match the review's language before publishing</label
+        ><input v-model="autoTranslateReply" type="checkbox" /> Translate reply
+        to match the review's language before publishing</label
       >
     </div>
     <p class="hint">
       Uses Chrome's built-in on-device translation. Requires a Chrome version
-      that supports it — falls back to publishing your reply as typed
-      otherwise.
+      that supports it — falls back to publishing your reply as typed otherwise.
     </p>
 
     <p role="status" aria-live="polite">{{ status }}</p>

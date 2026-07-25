@@ -5,6 +5,7 @@ import {
   parseReviewModifierItem,
   type ModifierKeys,
 } from '@/utils/shortcuts';
+import { showToast } from './toast';
 
 function flashHighlight(el: Element) {
   el.classList.remove('quote-ext-highlight');
@@ -66,13 +67,11 @@ export async function initParseReview(ctx: ContentScriptContext) {
 
       await navigator.clipboard.writeText(JSON.stringify(data, null, 2));
 
-      const toast = document.createElement('div');
-      toast.className = 'quote-ext-toast';
-      toast.innerText = matched
-        ? `✅ Copied quote by ${author}`
-        : `✅ Copied quote by ${author} (auto slug "${appName}" — configure in options)`;
-      document.body.appendChild(toast);
-      setTimeout(() => toast.remove(), 2500);
+      showToast(
+        matched
+          ? `✅ Copied quote by ${author}`
+          : `✅ Copied quote by ${author} (auto slug "${appName}" — configure in options)`,
+      );
     },
     { capture: true },
   );

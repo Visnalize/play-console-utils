@@ -2,10 +2,7 @@
 // Chrome 138 for many language pairs). Not yet in TS's lib.dom.d.ts, so
 // declared here rather than assumed available.
 type BuiltInAvailability =
-  | 'unavailable'
-  | 'downloadable'
-  | 'downloading'
-  | 'available';
+  'unavailable' | 'downloadable' | 'downloading' | 'available';
 
 interface BuiltInTranslator {
   translate(text: string): Promise<string>;

@@ -15,20 +15,7 @@ import {
   languagesMatch,
   translateText,
 } from '@/utils/translation';
-
-function showToast(
-  message: string,
-  opts: { sticky?: boolean } = {},
-): HTMLElement {
-  const toast = document.createElement('div');
-  toast.className = 'quote-ext-toast';
-  toast.innerText = message;
-  document.body.appendChild(toast);
-  if (!opts.sticky) {
-    setTimeout(() => toast.remove(), 2500);
-  }
-  return toast;
-}
+import { showToast } from './toast';
 
 function getReplyText(el: HTMLElement): string {
   return el.tagName === 'TEXTAREA'
@@ -108,7 +95,7 @@ async function translateReplyToReviewLanguage(
     showToast("✅ Reply translated to match the review's language");
     return true;
   } finally {
-    progressToast.remove();
+    progressToast.hide();
   }
 }
 

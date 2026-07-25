@@ -52,7 +52,9 @@ describe('detectLanguage', () => {
 
   it('detects and destroys the detector', async () => {
     const destroy = vi.fn();
-    const detect = vi.fn().mockResolvedValue([{ detectedLanguage: 'pt', confidence: 0.9 }]);
+    const detect = vi
+      .fn()
+      .mockResolvedValue([{ detectedLanguage: 'pt', confidence: 0.9 }]);
     (globalThis as Record<string, unknown>).LanguageDetector = {
       availability: vi.fn().mockResolvedValue('available'),
       create: vi.fn().mockResolvedValue({ detect, destroy }),
