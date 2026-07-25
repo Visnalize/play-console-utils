@@ -8,6 +8,11 @@ All notable changes to Play Console Utils are documented in this file.
 
 <!-- changelog-insert -->
 
+## [1.1.0] - 2026-07-25
+
+**Full Changelog**: https://github.com/Visnalize/play-console-utils/compare/v1.0.0...v1.1.0
+
+
 ## [1.0.0] - 2026-07-24
 
 ### Added
