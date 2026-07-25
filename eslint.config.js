@@ -7,4 +7,10 @@ export default tseslint.config(
   ...tseslint.configs.recommended,
   eslintConfigPrettier,
   { ignores: ['.wxt/', '.output/', 'docs/.vitepress/cache/', 'docs/.vitepress/dist/'] },
+  {
+    files: ['.github/scripts/**/*.mjs'],
+    languageOptions: {
+      globals: { process: 'readonly', console: 'readonly' },
+    },
+  },
 );

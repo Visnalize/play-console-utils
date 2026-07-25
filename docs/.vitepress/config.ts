@@ -5,7 +5,10 @@ export default defineConfig({
   description: 'Privacy policy for the Play Console Utils Chrome extension',
   cleanUrls: true,
   themeConfig: {
-    nav: [{ text: 'Privacy Policy', link: '/privacy' }],
+    nav: [
+      { text: 'Privacy Policy', link: '/privacy' },
+      { text: 'Changelog', link: '/changelog' },
+    ],
     socialLinks: [
       {
         icon: 'github',

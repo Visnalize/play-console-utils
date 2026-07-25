@@ -45,8 +45,47 @@ jobs:
       - name: Build & zip (Firefox)
         run: pnpm zip:firefox
 
+      - name: Generate release notes
+        id: notes
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          BODY=$(gh api "repos/${{ github.repository }}/releases/generate-notes" \
+            -f tag_name="${GITHUB_REF_NAME}" --jq .body)
+          {
+            echo "body<<NOTES_EOF"
+            echo "$BODY"
+            echo "NOTES_EOF"
+          } >> "$GITHUB_OUTPUT"
+
       - name: Create GitHub release
         uses: softprops/action-gh-release@v2
         with:
           files: .output/*.zip
-          generate_release_notes: true
+          body: ${{ steps.notes.outputs.body }}
+
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Update changelog
+        env:
+          NOTES: ${{ steps.notes.outputs.body }}
+        run: |
+          node .github/scripts/update-changelog.mjs \
+            "${GITHUB_REF_NAME#v}" \
+            "$(date -u +%Y-%m-%d)" \
+            "$NOTES"
+
+      - name: Commit changelog
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add docs/changelog.md
+          if git diff --cached --quiet; then
+            echo "No changelog changes to commit"
+          else
+            git commit -m "docs: update changelog for ${GITHUB_REF_NAME}"
+            git push origin HEAD:main
+          fi
