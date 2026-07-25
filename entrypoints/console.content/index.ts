@@ -1,9 +1,10 @@
 import './toast.css';
 import { initQuickReply } from './quick-reply';
 import { initParseReview } from './parse-review';
+import { CONSOLE_URL_MATCH_PATTERN } from '@/utils/console-url';
 
 export default defineContentScript({
-  matches: ['https://play.google.com/console/*'],
+  matches: [CONSOLE_URL_MATCH_PATTERN],
   async main(ctx) {
     await Promise.all([initQuickReply(ctx), initParseReview(ctx)]);
   },

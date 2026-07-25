@@ -1,0 +1,61 @@
+body {
+  font-family: system-ui, sans-serif;
+  width: 260px;
+  margin: 0;
+  padding: 1rem;
+  color: #1a1a1a;
+}
+
+h1 {
+  font-size: 1rem;
+  margin: 0 0 0.75rem;
+}
+
+.guidance {
+  font-size: 0.9rem;
+  color: #444;
+  margin: 0;
+}
+
+.links {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.links button,
+.links a {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  text-align: left;
+  padding: 0.5rem 0.6rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background: #fafafa;
+  color: #1a1a1a;
+  text-decoration: none;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+.links button:hover,
+.links a:hover {
+  background: #f0f0f0;
+}
+
+footer {
+  margin-top: 1rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid #e0e0e0;
+  font-size: 0.8rem;
+  color: #666;
+  text-align: center;
+}
+
+footer a {
+  color: #4285f4;
+}
