@@ -16,6 +16,7 @@
     "lint": "eslint .",
     "format": "prettier --write .",
     "test": "vitest run",
+    "release": "node scripts/release.mjs",
     "postinstall": "wxt prepare",
     "docs:dev": "vitepress dev docs",
     "docs:build": "vitepress build docs",

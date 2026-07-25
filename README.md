@@ -60,11 +60,11 @@ Pushing changes under `docs/` to `main` triggers [`.github/workflows/deploy-docs
 
 ## Releasing
 
-Pushing a tag matching `v*` (e.g. `v1.1.0`) triggers [`.github/workflows/release.yml`](.github/workflows/release.yml), which type-checks, lints, and tests the project, sets `package.json`'s version to match the tag, builds & zips both the Chrome and Firefox extensions, and publishes them as assets on a GitHub Release (auto-generated release notes from commits/PRs since the last tag).
-
 ```sh
-git tag v1.1.0
-git push origin v1.1.0
+pnpm release          # prompts for the version
+pnpm release 1.2.0    # or pass it directly
 ```
 
-`package.json`'s `version` is the single source of truth for the extension version — `wxt.config.ts` intentionally has no `version` field, so the built manifest always reflects it (and the release workflow keeps it in sync with the tag).
+[`scripts/release.mjs`](scripts/release.mjs) bumps `package.json`'s `version`, commits it, tags it (`v<version>`), and pushes the commit + tag to `origin/main` (after confirming you're on `main`, the working tree is clean, and `main` is up to date with `origin/main`). Pushing the tag triggers [`.github/workflows/release.yml`](.github/workflows/release.yml), which type-checks, lints, and tests the project, builds & zips both the Chrome and Firefox extensions, publishes them as assets on a GitHub Release (auto-generated release notes from commits/PRs since the last tag), and commits an update to `docs/changelog.md`.
+
+`package.json`'s `version` is the single source of truth for the extension version — `wxt.config.ts` intentionally has no `version` field, so the built manifest always reflects it.
