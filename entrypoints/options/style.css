@@ -121,3 +121,9 @@ td button[aria-label='Remove mapping'] {
   font-size: 0.85rem;
   margin: 0.25rem 0;
 }
+
+.hint {
+  color: #666;
+  font-size: 0.85rem;
+  margin: 0.25rem 0 0.75rem;
+}

@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this is
 
-A Chrome Manifest V3 extension (built with [WXT](https://wxt.dev)) that adds productivity shortcuts to the Google Play Console review section: a configurable quick-reply key combo, a configurable modifier+click "parse review" action that copies structured review JSON to the clipboard, an options page for configuring both plus per-app slug mappings, a background script that keeps the toolbar icon in sync with whether the active tab is a Play Console page, and a popup with quick links.
+A Chrome Manifest V3 extension (built with [WXT](https://wxt.dev)) that adds productivity shortcuts to the Google Play Console review section: a configurable quick-reply key combo (optionally auto-translating the reply to match the review's language before publishing), a configurable modifier+click "parse review" action that copies structured review JSON to the clipboard, an options page for configuring both plus per-app slug mappings, a background script that keeps the toolbar icon in sync with whether the active tab is a Play Console page, and a popup with quick links.
 
 ## Commands
 
@@ -38,19 +38,29 @@ There is no `manifest.json` in the repo. WXT generates it at build time from `wx
 
 `entrypoints/console.content/index.ts` is the only registered content script (directory-entrypoint form, matches `https://play.google.com/console/*`). Its `main(ctx)` wires up two independent feature modules that live alongside it:
 
-- `quick-reply.ts` — listens for a configurable key combo while a reply textarea/contenteditable is focused, finds and clicks the publish button (English/Spanish label variants), flashes it green.
+- `quick-reply.ts` — listens for a configurable key combo while a reply textarea/contenteditable is focused; if auto-translate is enabled, translates the reply to match the review's language first (see below), then finds and clicks the publish button (English/Spanish label variants), flashes it green.
 - `parse-review.ts` — listens for a configurable modifier+click on review text, scrapes author/date/avatar/content from the closest `.review-container`, resolves the app slug, copies JSON to the clipboard, shows a toast, and briefly highlights the review container (`.quote-ext-highlight` animation in `toast.css`).
 
 Both register listeners through `ctx.addEventListener(...)` / `ctx.onInvalidated(...)` (from the `ContentScriptContext` WXT passes into `main`), not raw `window`/`document` listeners — this auto-cleans-up if the extension reloads while the tab stays open, instead of the old manual `window.__xLoaded` guard pattern.
 
 **Gotcha:** `ContentScriptContext` must be imported as a type from `'wxt/utils/content-script-context'`. The auto-imported global of the same name is value-only (`declare const ContentScriptContext: typeof ...`) and will fail type-checking (`TS2749`) if used directly as a parameter type annotation.
 
+### Quick-reply auto-translation
+
+When `local:autoTranslateReply` is on (default), `quick-reply.ts` reads Play Console's own "Translated from X -" banner (`[debug-id="original-language-area-header"]`, inside the same `.review-container` as the reply box) to find the review's original language — `utils/review-language.ts`'s `extractTargetLanguageCode()` parses that banner text and maps the language name to a BCP-47 code via `utils/language-names.ts`. **The banner only renders when the review's language differs from the console's display language**, so its absence is treated as "already matches, skip translation," not a detection failure.
+
+`utils/translation.ts` wraps Chrome's on-device `Translator`/`LanguageDetector` globals (stable since Chrome 138 for many language pairs, not yet in TS's `lib.dom.d.ts` — hence the local ambient `declare global` there). It detects the reply's own language first (to skip a no-op translation when the reply is already in the target language) and no-ops safely — falling back to publishing the reply as typed — when the APIs are unsupported or a language pair is unavailable. No network requests are involved; translation runs entirely on-device.
+
+**Gotcha:** after programmatically overwriting the reply box's content, the publish button's `disabled` state does *not* flip synchronously — Play Console's Angular change detection needs a tick to react to the dispatched `input`/`change` events. Checking `publishBtn.disabled` immediately after the mutation reads the stale (disabled) value and silently no-ops (no thrown error, so nothing shows up in the console). `quick-reply.ts`'s `waitForEnabledPublishButton()` polls (50ms interval, 1s timeout) instead of checking once, and only after a translation actually happened — the untranslated path still checks the button immediately, unchanged from before. If the poll still times out, a toast + `console.warn` tell the user to click Publish manually rather than failing silently again.
+
+**Unverified in a real browser:** the assumption that the reply textarea/contenteditable lives inside the same `.review-container` as the language banner. Confirm against a live foreign-language review.
+
 ### Config is `chrome.storage`-backed, shared between content scripts and the options page
 
 Two modules under `utils/` define storage schemas via `@wxt-dev/storage`'s `storage.defineItem` (imported explicitly, not via WXT's `#imports` auto-import, so they stay usable from plain unit tests):
 
 - `utils/app-mapping.ts` — `local:appMappings`: array of `{label, slug}`. `resolveAppSlug()` tries exact label match, then substring match (preserving the original `.includes()`-style fuzzy behavior), then falls back to auto-slugifying the raw label. No mapping is pre-seeded on install.
-- `utils/shortcuts.ts` — `local:quickReplyShortcut` (modifiers + a trigger key, default Ctrl/⌘+Enter) and `local:parseReviewModifier` (modifiers only, default Alt). Matching is **exact** on every modifier flag — a deliberate tightening vs. the original hardcoded checks, necessary so distinct configured combos don't collide.
+- `utils/shortcuts.ts` — `local:quickReplyShortcut` (modifiers + a trigger key, default Ctrl/⌘+Enter), `local:parseReviewModifier` (modifiers only, default Alt), and `local:autoTranslateReply` (boolean, default `true`). Modifier matching is **exact** on every flag — a deliberate tightening vs. the original hardcoded checks, necessary so distinct configured combos don't collide.
 
 Content scripts load the current value on init _and_ call `.watch(...)` on the storage item so options-page edits apply live without a page reload — don't reintroduce a load-once pattern here.
 

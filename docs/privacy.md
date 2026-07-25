@@ -20,7 +20,9 @@ This policy explains what data the extension accesses and, most importantly, wha
 
 **Page content on Google Play Console.** The extension's content script only runs on pages matching `https://play.google.com/console/*`. When you use the "parse review" shortcut, it reads text already visible on the page — the review author's name, date, the review text, the reviewer's avatar image URL, and the currently selected app's name — and copies it as JSON to your clipboard. This happens only when you deliberately trigger the shortcut; nothing is read or copied automatically or in the background.
 
-**Extension settings.** Your configured quick-reply key combo, parse-review modifier key, and app label→slug mappings are saved using the browser's built-in `storage` API (`chrome.storage`). This data is stored locally by your browser and is not accessible to the extension developer or any third party.
+**Quick-reply translation (optional, on by default).** When you trigger the quick-reply shortcut, the extension reads the text you've typed in the reply box and, if the review is shown in a different language, translates it to match using Chrome's built-in on-device translation feature before publishing. This runs entirely on your device via your browser — no reply text, review text, or any other data is sent to the extension developer or any third-party server. You can turn this off in the options page.
+
+**Extension settings.** Your configured quick-reply key combo, auto-translate toggle, parse-review modifier key, and app label→slug mappings are saved using the browser's built-in `storage` API (`chrome.storage`). This data is stored locally by your browser and is not accessible to the extension developer or any third party.
 
 ## What the extension does not do
 

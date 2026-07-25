@@ -36,6 +36,11 @@ export const parseReviewModifierItem = storage.defineItem<ModifierKeys>(
   },
 );
 
+export const autoTranslateReplyItem = storage.defineItem<boolean>(
+  'local:autoTranslateReply',
+  { fallback: true, version: 1 },
+);
+
 export function hasAnyModifier(modifier: ModifierKeys): boolean {
   return modifier.ctrlOrMeta || modifier.shift || modifier.alt;
 }
