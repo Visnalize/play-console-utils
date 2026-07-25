@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this is
 
-A Chrome Manifest V3 extension (built with [WXT](https://wxt.dev)) that adds productivity shortcuts to the Google Play Console review section: a configurable quick-reply key combo, a configurable modifier+click "parse review" action that copies structured review JSON to the clipboard, and an options page for configuring both plus per-app slug mappings.
+A Chrome Manifest V3 extension (built with [WXT](https://wxt.dev)) that adds productivity shortcuts to the Google Play Console review section: a configurable quick-reply key combo, a configurable modifier+click "parse review" action that copies structured review JSON to the clipboard, an options page for configuring both plus per-app slug mappings, a background script that keeps the toolbar icon in sync with whether the active tab is a Play Console page, and a popup with quick links.
 
 ## Commands
 
@@ -54,6 +54,20 @@ Two modules under `utils/` define storage schemas via `@wxt-dev/storage`'s `stor
 
 Content scripts load the current value on init _and_ call `.watch(...)` on the storage item so options-page edits apply live without a page reload — don't reintroduce a load-once pattern here.
 
+### Shared Play Console URL matcher
+
+`utils/console-url.ts` exports `CONSOLE_URL_MATCH_PATTERN` (`https://play.google.com/console/*`) and `isConsoleUrl()`. It's the single source of truth for "is this a Play Console page" — used by the content script's `matches`, the background script's icon logic, and the popup's guidance-vs-links check. Don't hardcode the pattern or a second URL check elsewhere.
+
+### Background script keeps the toolbar icon in sync
+
+`entrypoints/background.ts` sets the per-tab toolbar icon via `browser.action.setIcon({tabId, path})`: colored (`/icons/*.png`) when `isConsoleUrl(tab.url)`, grayscale (`/icons/gray/*.png`, generated from the colored set) otherwise — grayscale is also `action.default_icon` in `wxt.config.ts`, so new tabs start gray before any listener fires. It listens on `tabs.onUpdated` and `tabs.onActivated`, plus a one-time `tabs.query({})` sweep on startup for tabs already open.
+
+**Gotcha:** `tab.url` is only populated when the extension has host permission for that tab's *current* URL. Declaring `https://play.google.com/console/*` only via `content_scripts.matches` was *not* enough to reveal it to `tabs.onUpdated`/`tabs.query` in testing — `tab.url` came back `undefined` for every tab, console pages included, so the icon logic silently never fired. Fixed by also adding `host_permissions: [CONSOLE_URL_MATCH_PATTERN]` in `wxt.config.ts`. If you add other tab/URL-reading logic, don't assume `content_scripts.matches` alone grants it.
+
+### Popup
+
+`entrypoints/popup/` (Vue, same `@wxt-dev/module-vue` setup as options). On mount it queries the active tab (`browser.tabs.query({active: true, currentWindow: true})`) and branches on `isConsoleUrl(tab.url)`: off Play Console it shows a short guidance message; on Play Console it shows an "Options" button (`browser.runtime.openOptionsPage()`), a docs link to `pcu.visnalize.com`, and a "By Visnalize" credit footer linking to `visnalize.com`.
+
 ### Options page (Vue)
 
 `entrypoints/options/` uses `@wxt-dev/module-vue` (declared in `wxt.config.ts`'s `modules`). `App.vue` composes two independent sections:
@@ -64,3 +78,5 @@ Content scripts load the current value on init _and_ call `.watch(...)` on the s
 ### Testing
 
 `vitest.config.ts` uses the `WxtVitest` plugin (`wxt/testing/vitest-plugin`), which polyfills `browser`/`chrome` with an in-memory `@webext-core/fake-browser` implementation — this is what makes `storage.defineItem()` work in tests with no manual mocking. Reset state between tests with `fakeBrowser.reset()` (from `wxt/testing/fake-browser`), not by manually clearing storage values.
+
+`fake-browser` doesn't model per-tab icon state or real popup/tab-focus semantics, so the background script's icon logic and the popup's active-tab branching aren't covered by vitest — they need a real Chromium loading `.output/chrome-mv3` to verify (see the `run` skill).

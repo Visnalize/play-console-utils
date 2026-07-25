@@ -6,7 +6,7 @@ title: Privacy Policy
 
 **Last updated: 2026-07-25**
 
-Play Console Utils ("the extension") is a browser extension that adds productivity shortcuts to the Google Play Console review section: a configurable quick-reply key combo, a configurable modifier+click action that copies structured review data to your clipboard, and an options page for configuring both plus per-app label mappings.
+Play Console Utils ("the extension") is a browser extension that adds productivity shortcuts to the Google Play Console review section: a configurable quick-reply key combo, a configurable modifier+click action that copies structured review data to your clipboard, an options page for configuring both plus per-app label mappings, and a toolbar icon/popup that indicate whether the current tab is a Play Console page.
 
 This policy explains what data the extension accesses and, most importantly, what it does not do with it.
 
@@ -31,7 +31,7 @@ This policy explains what data the extension accesses and, most importantly, wha
 
 ## Permissions
 
-The extension requests only the `storage` permission, used exclusively to save your own configuration (shortcuts and app mappings) locally via `chrome.storage`. It also runs a content script scoped to `https://play.google.com/console/*`, which is required for the quick-reply and parse-review features to function on that page.
+The extension requests the `storage` permission, used exclusively to save your own configuration (shortcuts and app mappings) locally via `chrome.storage`. It also declares host permission for `https://play.google.com/console/*`, which is required for the quick-reply and parse-review content script to run there, and for a background script to read the URL of tabs on that host so it can show the colored toolbar icon only there (grayscale everywhere else). No URL or tab information for any other site is ever read.
 
 ## Data retention and deletion
 

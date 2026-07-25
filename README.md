@@ -8,6 +8,8 @@ A Chrome extension (Manifest V3, built with [WXT](https://wxt.dev)) that adds sm
 - **Parse review (Alt + Click by default)** — Click a review's text while holding the configured modifier(s) to copy a structured JSON snippet to the clipboard containing the author name, date, app slug, review content, and avatar image URL. Shows a toast notification confirming the copy.
 - **Configurable app slugs (Options page)** — Map each Play Console app label to your own slug, used in the JSON copied by the Parse review feature. Apps without a configured mapping fall back to an auto-generated slug.
 - **Configurable shortcuts (Options page)** — Change the quick-reply key combo (click "Record" and press your combo) and the parse-review click modifier(s), independent of the app slug mapping. Changes apply immediately, no reload needed.
+- **Active-state toolbar icon** — The toolbar icon is grayscale by default and switches to the full-color icon on tabs where the Play Console features are active (`https://play.google.com/console/*`).
+- **Popup** — Click the toolbar icon for quick links to the Options page and the [documentation site](https://pcu.visnalize.com); on non-Play-Console tabs it shows a short reminder that the extension only works there.
 
 ## Development
 
@@ -23,7 +25,7 @@ Load the unpacked extension from `.output/chrome-mv3-dev` (`chrome://extensions`
 
 ## Configuring app slugs & shortcuts
 
-Right-click the extension icon → **Options** (or `chrome://extensions` → Play Console Utils → Details → Extension options).
+Click the extension icon → **Options** in the popup (or right-click the icon → **Options**, or `chrome://extensions` → Play Console Utils → Details → Extension options).
 
 - **App slugs**: add a row per app — the label as shown in Play Console's active-app selector, and the slug you want in the copied JSON.
 - **Shortcuts**: click the quick-reply combo button and press your desired key combo (Esc cancels); check/uncheck modifiers for the parse-review click trigger (at least one must stay selected). Both save automatically.
