@@ -44,6 +44,18 @@ pnpm format       # prettier --write
 pnpm test         # vitest
 ```
 
+## Docs & privacy policy site
+
+The `docs/` folder is a [VitePress](https://vitepress.dev) site (currently just the privacy policy, at `docs/privacy/index.md`) published to `https://pcu.visnalize.com`.
+
+```sh
+pnpm docs:dev      # local dev server with hot reload
+pnpm docs:build    # build static site to docs/.vitepress/dist
+pnpm docs:preview  # preview the production build locally
+```
+
+Pushing changes under `docs/` to `main` triggers [`.github/workflows/deploy-docs.yml`](.github/workflows/deploy-docs.yml), which builds the site and deploys it to GitHub Pages.
+
 ## Releasing
 
 Pushing a tag matching `v*` (e.g. `v1.1.0`) triggers [`.github/workflows/release.yml`](.github/workflows/release.yml), which type-checks, lints, and tests the project, sets `package.json`'s version to match the tag, builds & zips both the Chrome and Firefox extensions, and publishes them as assets on a GitHub Release (auto-generated release notes from commits/PRs since the last tag).

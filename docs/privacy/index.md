@@ -1,0 +1,46 @@
+---
+title: Privacy Policy
+---
+
+# Privacy Policy for Play Console Utils
+
+**Last updated: 2026-07-25**
+
+Play Console Utils ("the extension") is a browser extension that adds productivity shortcuts to the Google Play Console review section: a configurable quick-reply key combo, a configurable modifier+click action that copies structured review data to your clipboard, and an options page for configuring both plus per-app label mappings.
+
+This policy explains what data the extension accesses and, most importantly, what it does not do with it.
+
+## Summary
+
+- The extension does not collect, transmit, sell, or share any data.
+- It has no server, no analytics, and no network requests of any kind.
+- All data it handles stays on your device, inside your browser's local storage or your system clipboard.
+
+## What the extension accesses
+
+**Page content on Google Play Console.** The extension's content script only runs on pages matching `https://play.google.com/console/*`. When you use the "parse review" shortcut, it reads text already visible on the page — the review author's name, date, the review text, the reviewer's avatar image URL, and the currently selected app's name — and copies it as JSON to your clipboard. This happens only when you deliberately trigger the shortcut; nothing is read or copied automatically or in the background.
+
+**Extension settings.** Your configured quick-reply key combo, parse-review modifier key, and app label→slug mappings are saved using the browser's built-in `storage` API (`chrome.storage`). This data is stored locally by your browser and is not accessible to the extension developer or any third party.
+
+## What the extension does not do
+
+- It does not make any network requests — there is no remote server this extension talks to.
+- It does not use analytics, crash reporting, or telemetry of any kind.
+- It does not collect or transmit personal data, browsing history, or review content anywhere outside your own device.
+- It does not share data with third parties, because no data ever leaves your browser.
+
+## Permissions
+
+The extension requests only the `storage` permission, used exclusively to save your own configuration (shortcuts and app mappings) locally via `chrome.storage`. It also runs a content script scoped to `https://play.google.com/console/*`, which is required for the quick-reply and parse-review features to function on that page.
+
+## Data retention and deletion
+
+All data (your settings) lives in your browser's local extension storage. You can clear it at any time by removing the extension, or by clearing the extension's storage via your browser's settings. Clipboard contents are managed entirely by your operating system, not by the extension.
+
+## Changes to this policy
+
+If this extension's data practices change in the future, this document will be updated accordingly, and the "Last updated" date above will reflect the change.
+
+## Contact
+
+Questions about this policy can be directed to: <hey@visnalize.com>

@@ -6,5 +6,5 @@ export default tseslint.config(
   js.configs.recommended,
   ...tseslint.configs.recommended,
   eslintConfigPrettier,
-  { ignores: ['.wxt/', '.output/'] },
+  { ignores: ['.wxt/', '.output/', 'docs/.vitepress/cache/', 'docs/.vitepress/dist/'] },
 );
