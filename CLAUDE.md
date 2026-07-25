@@ -36,7 +36,7 @@ There is no `manifest.json` in the repo. WXT generates it at build time from `wx
 
 ### One content-script entrypoint, two feature modules
 
-`entrypoints/console.content/index.ts` is the only registered content script (directory-entrypoint form, matches `https://play.google.com/console/*`). Its `main(ctx)` wires up two independent feature modules that live alongside it:
+`entrypoints/reviews.content/index.ts` is the only registered content script (directory-entrypoint form, matches `https://play.google.com/console/*`). Its `main(ctx)` wires up two independent feature modules that live alongside it:
 
 - `quick-reply.ts` — listens for a configurable key combo while a reply textarea/contenteditable is focused; if auto-translate is enabled, translates the reply to match the review's language first (see below), then finds and clicks the publish button (English/Spanish label variants), flashes it green.
 - `parse-review.ts` — listens for a configurable modifier+click on review text, scrapes author/date/avatar/content from the closest `.review-container`, resolves the app slug, copies JSON to the clipboard, shows a toast, and briefly highlights the review container (`.quote-ext-highlight` animation in `toast.css`).
