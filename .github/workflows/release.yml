@@ -79,13 +79,25 @@ jobs:
             "$NOTES"
 
       - name: Commit changelog
+        id: changelog
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add docs/changelog.md
           if git diff --cached --quiet; then
             echo "No changelog changes to commit"
+            echo "changed=false" >> "$GITHUB_OUTPUT"
           else
             git commit -m "docs: update changelog for ${GITHUB_REF_NAME}"
             git push origin HEAD:main
+            echo "changed=true" >> "$GITHUB_OUTPUT"
           fi
+
+      # The tag was pushed (and the release created) before the changelog commit
+      # existed, so it points one commit behind main. Move it onto the changelog
+      # commit so the release/tag actually contains the changelog update.
+      - name: Move release tag onto changelog commit
+        if: steps.changelog.outputs.changed == 'true'
+        run: |
+          git tag -f "$GITHUB_REF_NAME"
+          git push origin "$GITHUB_REF_NAME" --force

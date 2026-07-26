@@ -7,6 +7,13 @@ on:
     paths:
       - 'docs/**'
       - '.github/workflows/deploy-docs.yml'
+  # The Release workflow commits changelog updates to docs/ using the default
+  # GITHUB_TOKEN, whose pushes don't trigger other workflows' `push` triggers
+  # (loop prevention) — so the filter above never fires for that commit. This
+  # picks it up instead, once the Release workflow (whatever its outcome) is done.
+  workflow_run:
+    workflows: [Release]
+    types: [completed]
   workflow_dispatch:
 
 permissions:
@@ -21,6 +28,7 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
+    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
     steps:
       - name: Checkout
         uses: actions/checkout@v5
