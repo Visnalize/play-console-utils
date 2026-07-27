@@ -1,0 +1,20 @@
+⭐ QUICK REPLY
+Press a keyboard shortcut (Ctrl/Cmd + Enter by default) while your cursor is in a reply box to publish it instantly, no mouse needed. Works with both plain and rich-text reply boxes, and recognizes the Publish button in English and Spanish.
+
+⭐ AUTO-TRANSLATE REPLIES
+Write your reply in your own language — if the review was posted in a different language, your reply is automatically translated to match it before publishing. Translation runs fully on-device using Chrome's built-in AI, so nothing is ever sent over the network. Turn it off anytime from Options if you'd rather always publish exactly what you typed.
+
+⭐ PARSE REVIEW
+Hold a modifier key (Alt by default) and click any review's text to copy its details as JSON to your clipboard: author, date, app, content, and avatar image. A toast confirms the copy and briefly highlights the review.
+
+⭐ CUSTOM APP SLUGS
+Map each app's name to your own short slug for use in the copied JSON, matching whatever naming scheme your team already uses.
+
+⭐ FULLY CUSTOMIZABLE
+Change the quick-reply combo and the parse-review modifier keys from the Options page. Changes save and apply instantly, no reload required.
+
+⭐ PRIVATE BY DESIGN
+Everything runs locally in your browser against the Play Console page you're already on. No review content or reply text is ever sent anywhere — translation uses Chrome's on-device models, not a cloud service. The extension only stores your own settings (shortcuts, app slugs) locally.
+
+Homepage and docs: https://pcu.visnalize.com
+Source code: https://github.com/Visnalize/play-console-utils

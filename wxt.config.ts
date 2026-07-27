@@ -5,8 +5,7 @@ export default defineConfig({
   modules: ['@wxt-dev/module-vue'],
   manifest: {
     name: 'Play Console Utils',
-    description:
-      'Quick-reply and review-parsing shortcuts for the Google Play Console.',
+    description: 'Productivity utilities and shortcuts for Google Play Console',
     permissions: ['storage'],
     host_permissions: [CONSOLE_URL_MATCH_PATTERN],
     icons: {
