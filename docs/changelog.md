@@ -8,6 +8,13 @@ All notable changes to Play Console Utils are documented in this file.
 
 <!-- changelog-insert -->
 
+## [1.1.1] - 2026-07-27
+
+- chore: add store listing assets (2e51dfa)
+
+**Full Changelog**: https://github.com/Visnalize/play-console-utils/compare/v1.1.0...v1.1.1
+
+
 ## [1.1.0] - 2026-07-26
 
 - fix: generate release notes from commit log instead of PR-based API (d47f757)
