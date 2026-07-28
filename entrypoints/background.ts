@@ -1,4 +1,5 @@
 import { isConsoleUrl } from '@/utils/console-url';
+import { migrateLocalSettingsToSync } from '@/utils/storage-migration';
 
 const ACTIVE_ICON = {
   16: '/icons/icon16.png',
@@ -20,6 +21,8 @@ async function syncIcon(tabId: number, url: string | undefined) {
 }
 
 export default defineBackground(() => {
+  void migrateLocalSettingsToSync();
+
   browser.tabs.onUpdated.addListener((tabId, _changeInfo, tab) => {
     void syncIcon(tabId, tab.url);
   });

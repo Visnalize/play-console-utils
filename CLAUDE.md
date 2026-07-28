@@ -61,10 +61,16 @@ When `local:autoTranslateReply` is on (default), `quick-reply.ts` reads Play Con
 
 Two modules under `utils/` define storage schemas via `@wxt-dev/storage`'s `storage.defineItem` (imported explicitly, not via WXT's `#imports` auto-import, so they stay usable from plain unit tests):
 
-- `utils/app-mapping.ts` — `local:appMappings`: array of `{label, slug}`. `resolveAppSlug()` tries exact label match, then substring match (preserving the original `.includes()`-style fuzzy behavior), then falls back to auto-slugifying the raw label. No mapping is pre-seeded on install.
-- `utils/shortcuts.ts` — `local:quickReplyShortcut` (modifiers + a trigger key, default Ctrl/⌘+Enter), `local:parseReviewModifier` (modifiers only, default Alt), and `local:autoTranslateReply` (boolean, default `true`). Modifier matching is **exact** on every flag — a deliberate tightening vs. the original hardcoded checks, necessary so distinct configured combos don't collide.
+- `utils/app-mapping.ts` — `sync:appMappings`: array of `{label, slug}`. `resolveAppSlug()` tries exact label match, then substring match (preserving the original `.includes()`-style fuzzy behavior), then falls back to auto-slugifying the raw label. No mapping is pre-seeded on install.
+- `utils/shortcuts.ts` — `sync:quickReplyShortcut` (modifiers + a trigger key, default Ctrl/⌘+Enter), `sync:parseReviewModifier` (modifiers only, default Alt), and `sync:autoTranslateReply` (boolean, default `true`). Modifier matching is **exact** on every flag — a deliberate tightening vs. the original hardcoded checks, necessary so distinct configured combos don't collide.
+
+All four items live in `chrome.storage.sync` (not `.local`) so settings roam with the user's Chrome profile across devices. `utils/app-mapping.ts`'s app mapping list is the one item with meaningful size — `chrome.storage.sync` caps each item at 8KB, so `AppMappingsSection.vue`'s `persist()` catches a quota-exceeded write and surfaces it in the status line instead of silently failing.
 
 Content scripts load the current value on init _and_ call `.watch(...)` on the storage item so options-page edits apply live without a page reload — don't reintroduce a load-once pattern here.
+
+### One-time local→sync storage migration
+
+These settings originally lived in `chrome.storage.local` (per-device); `utils/storage-migration.ts`'s `migrateLocalSettingsToSync()` copies any pre-existing `local:*` value over to its `sync:*` counterpart, run once from `entrypoints/background.ts`'s top-level `defineBackground(() => ...)` body (not gated behind an `onInstalled` listener) so it fires whenever the service worker wakes — cheap and idempotent, since it only writes when the `sync:` key is still unset. It deliberately never overwrites a `sync:` value once _any_ device has migrated it in, and never deletes the old `local:` value (harmless leftover, cheap insurance against a migration bug losing data). This code — and the legacy `local:*` key literals in it — can be deleted once enough time has passed that no user is expected to still be upgrading from a pre-sync version.
 
 ### Shared Play Console URL matcher
 

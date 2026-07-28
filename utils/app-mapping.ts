@@ -6,7 +6,7 @@ export interface AppMapping {
 }
 
 export const appMappingsItem = storage.defineItem<AppMapping[]>(
-  'local:appMappings',
+  'sync:appMappings',
   { fallback: [], version: 1 },
 );
 

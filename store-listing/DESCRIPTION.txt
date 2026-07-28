@@ -13,8 +13,11 @@ Map each app's name to your own short slug for use in the copied JSON, matching 
 ⭐ FULLY CUSTOMIZABLE
 Change the quick-reply combo and the parse-review modifier keys from the Options page. Changes save and apply instantly, no reload required.
 
+⭐ SETTINGS SYNC ACROSS DEVICES
+Your shortcuts, auto-translate toggle, and app slugs follow you to any other Chrome profile you're signed into, via Chrome's own sync — no account or setup needed beyond being signed into Chrome.
+
 ⭐ PRIVATE BY DESIGN
-Everything runs locally in your browser against the Play Console page you're already on. No review content or reply text is ever sent anywhere — translation uses Chrome's on-device models, not a cloud service. The extension only stores your own settings (shortcuts, app slugs) locally.
+Everything runs locally in your browser against the Play Console page you're already on. No review content or reply text is ever sent anywhere — translation uses Chrome's on-device models, not a cloud service. The extension only stores your own settings (shortcuts, app slugs), via Chrome's built-in sync storage.
 
 Homepage and docs: https://pcu.visnalize.com
 Source code: https://github.com/Visnalize/play-console-utils

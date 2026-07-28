@@ -85,11 +85,19 @@ async function persist() {
   const cleaned = rows
     .map((r) => ({ label: r.label.trim(), slug: r.slug.trim() }))
     .filter((r) => r.label !== '' && r.slug !== '');
-  await appMappingsItem.setValue(cleaned);
-  status.value = 'Saved';
-  setTimeout(() => {
-    if (status.value === 'Saved') status.value = '';
-  }, 1500);
+  try {
+    await appMappingsItem.setValue(cleaned);
+    status.value = 'Saved';
+    setTimeout(() => {
+      if (status.value === 'Saved') status.value = '';
+    }, 1500);
+  } catch (err) {
+    // chrome.storage.sync caps each item at 8KB — a large mapping list can exceed
+    // that even though the equivalent chrome.storage.local write always succeeded.
+    console.error('Play Console Utils: failed to save app mappings.', err);
+    status.value =
+      'Save failed — you may have too many mappings for Chrome sync storage. Remove some and try again.';
+  }
 }
 
 function removeRow(i: number) {

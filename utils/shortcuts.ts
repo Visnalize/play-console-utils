@@ -24,12 +24,12 @@ export const DEFAULT_PARSE_REVIEW_MODIFIER: ModifierKeys = {
 };
 
 export const quickReplyShortcutItem = storage.defineItem<QuickReplyShortcut>(
-  'local:quickReplyShortcut',
+  'sync:quickReplyShortcut',
   { fallback: DEFAULT_QUICK_REPLY_SHORTCUT, version: 1 },
 );
 
 export const parseReviewModifierItem = storage.defineItem<ModifierKeys>(
-  'local:parseReviewModifier',
+  'sync:parseReviewModifier',
   {
     fallback: DEFAULT_PARSE_REVIEW_MODIFIER,
     version: 1,
@@ -37,7 +37,7 @@ export const parseReviewModifierItem = storage.defineItem<ModifierKeys>(
 );
 
 export const autoTranslateReplyItem = storage.defineItem<boolean>(
-  'local:autoTranslateReply',
+  'sync:autoTranslateReply',
   { fallback: true, version: 1 },
 );
 
