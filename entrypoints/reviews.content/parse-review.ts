@@ -5,18 +5,13 @@ import {
   parseReviewModifierItem,
   type ModifierKeys,
 } from '@/utils/shortcuts';
+import {
+  extractAuthorFromContainer,
+  extractDateFromContainer,
+  getActiveAppLabel,
+} from '@/utils/review-fields';
 import { showToast } from './toast';
-
-function flashHighlight(el: Element) {
-  el.classList.remove('quote-ext-highlight');
-  void (el as HTMLElement).offsetWidth; // force reflow so the animation restarts on repeat captures
-  el.classList.add('quote-ext-highlight');
-  el.addEventListener(
-    'animationend',
-    () => el.classList.remove('quote-ext-highlight'),
-    { once: true },
-  );
-}
+import { flashHighlight } from './highlight';
 
 export async function initParseReview(ctx: ContentScriptContext) {
   let modifier: ModifierKeys = await parseReviewModifierItem.getValue();
@@ -34,24 +29,17 @@ export async function initParseReview(ctx: ContentScriptContext) {
       e.stopPropagation();
 
       const target = e.target as HTMLElement;
-      const appLabel =
-        document.querySelector('.active-app-button')?.ariaLabel ?? '';
-      const { slug: appName, matched } = await resolveAppSlug(appLabel);
+      const { slug: appName, matched } = await resolveAppSlug(
+        getActiveAppLabel(),
+      );
 
       const reviewContainer = target.closest('.review-container');
       if (reviewContainer) flashHighlight(reviewContainer);
 
       const avatar =
         reviewContainer?.querySelector<HTMLImageElement>('.review-avatar');
-      const author =
-        reviewContainer
-          ?.querySelector<HTMLElement>('.author-display-name')
-          ?.innerText?.trim() || 'Unknown Author';
-      const dateEl =
-        reviewContainer?.querySelector<HTMLElement>('.last-update-time');
-      let dateStr = dateEl ? dateEl.innerText.trim() : 'Unknown Date';
-      if (dateStr.includes(','))
-        dateStr = dateStr.split(',').slice(0, 2).join(',').trim();
+      const author = extractAuthorFromContainer(reviewContainer);
+      const dateStr = extractDateFromContainer(reviewContainer);
       const content = target.innerText.trim();
 
       const data: Record<string, string> = {

@@ -15,14 +15,14 @@
 
 <script setup lang="ts">
 import { computed, onBeforeUnmount, ref } from 'vue';
-import { formatShortcut, type QuickReplyShortcut } from '@/utils/shortcuts';
+import { formatShortcut, type KeyShortcut } from '@/utils/shortcuts';
 import { RotateCcw } from '@lucide/vue';
 
 const props = defineProps<{
-  modelValue: QuickReplyShortcut;
-  defaultValue: QuickReplyShortcut;
+  modelValue: KeyShortcut;
+  defaultValue: KeyShortcut;
 }>();
-const emit = defineEmits<{ 'update:modelValue': [QuickReplyShortcut] }>();
+const emit = defineEmits<{ 'update:modelValue': [KeyShortcut] }>();
 
 const recording = ref(false);
 const display = computed(() => formatShortcut(props.modelValue));

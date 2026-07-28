@@ -1,9 +1,9 @@
 import type { ContentScriptContext } from 'wxt/utils/content-script-context';
 import {
   autoTranslateReplyItem,
-  matchesQuickReplyShortcut,
+  matchesKeyShortcut,
   quickReplyShortcutItem,
-  type QuickReplyShortcut,
+  type KeyShortcut,
 } from '@/utils/shortcuts';
 import {
   ORIGINAL_LANGUAGE_HEADER_SELECTOR,
@@ -16,33 +16,16 @@ import {
   translateText,
 } from '@/utils/translation';
 import { showToast } from './toast';
+import { getFocusedReplyField, getReplyText, setReplyText } from './reply-field';
+import { findButtonByText, isButtonDisabled } from './button-finder';
 
-function getReplyText(el: HTMLElement): string {
-  return el.tagName === 'TEXTAREA'
-    ? (el as HTMLTextAreaElement).value
-    : el.innerText;
-}
-
-function setReplyText(el: HTMLElement, text: string) {
-  if (el.tagName === 'TEXTAREA') {
-    (el as HTMLTextAreaElement).value = text;
-  } else {
-    el.innerText = text;
-  }
-  el.dispatchEvent(new Event('input', { bubbles: true }));
-  el.dispatchEvent(new Event('change', { bubbles: true }));
-}
-
-function findPublishButton(): HTMLButtonElement | undefined {
-  return Array.from(document.querySelectorAll('button')).find((btn) => {
-    const txt = btn.textContent?.trim().toLowerCase() ?? '';
-    return (
-      txt.includes('publish reply') ||
-      txt.includes('publish') ||
-      txt.includes('enviar') ||
-      txt.includes('responder')
-    );
-  });
+function findPublishButton(): HTMLElement | undefined {
+  return findButtonByText(document, [
+    'publish reply',
+    'publish',
+    'enviar',
+    'responder',
+  ]);
 }
 
 // Setting the reply's content programmatically still routes through Play
@@ -52,10 +35,10 @@ function findPublishButton(): HTMLButtonElement | undefined {
 async function waitForEnabledPublishButton(
   timeoutMs = 1000,
   intervalMs = 50,
-): Promise<HTMLButtonElement | undefined> {
+): Promise<HTMLElement | undefined> {
   const deadline = Date.now() + timeoutMs;
   let btn = findPublishButton();
-  while ((!btn || btn.disabled) && Date.now() < deadline) {
+  while ((!btn || isButtonDisabled(btn)) && Date.now() < deadline) {
     await new Promise((resolve) => setTimeout(resolve, intervalMs));
     btn = findPublishButton();
   }
@@ -100,7 +83,7 @@ async function translateReplyToReviewLanguage(
 }
 
 export async function initQuickReply(ctx: ContentScriptContext) {
-  let shortcut: QuickReplyShortcut = await quickReplyShortcutItem.getValue();
+  let shortcut: KeyShortcut = await quickReplyShortcutItem.getValue();
   const unwatchShortcut = quickReplyShortcutItem.watch((value) => {
     shortcut = value;
   });
@@ -113,30 +96,22 @@ export async function initQuickReply(ctx: ContentScriptContext) {
   ctx.onInvalidated(() => unwatchAutoTranslate());
 
   ctx.addEventListener(window, 'keydown', async (e: KeyboardEvent) => {
-    if (!matchesQuickReplyShortcut(e, shortcut)) return;
+    if (!matchesKeyShortcut(e, shortcut)) return;
 
-    const active = document.activeElement;
-    if (
-      !active ||
-      !(
-        active.tagName === 'TEXTAREA' ||
-        (active as HTMLElement).isContentEditable
-      )
-    ) {
-      return;
-    }
+    const active = getFocusedReplyField();
+    if (!active) return;
 
     e.preventDefault();
 
     const translated = autoTranslate
-      ? await translateReplyToReviewLanguage(active as HTMLElement)
+      ? await translateReplyToReviewLanguage(active)
       : false;
 
     const publishBtn = translated
       ? await waitForEnabledPublishButton()
       : findPublishButton();
 
-    if (!publishBtn || publishBtn.disabled) {
+    if (!publishBtn || isButtonDisabled(publishBtn)) {
       if (translated) {
         console.warn(
           'Play Console Utils: reply was translated but the publish button never became available.',

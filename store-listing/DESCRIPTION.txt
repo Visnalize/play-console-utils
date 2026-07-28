@@ -7,20 +7,26 @@ Write your reply in your own language — if the review was posted in a differen
 ⭐ PARSE REVIEW
 Hold a modifier key (Alt by default) and click any review's text to copy its details as JSON to your clipboard: author, date, app, content, and avatar image. A toast confirms the copy and briefly highlights the review.
 
+⭐ CANNED REPLY TEMPLATES
+Save your go-to responses once, then press a keyboard shortcut (Ctrl/Cmd + K by default) while replying to pick one from a quick floating list. Templates can include the reviewer's name, the review date, and the app name as placeholders, automatically filled in before you publish.
+
+⭐ REVIEW NAVIGATION
+Jump to the next or previous review with a keyboard shortcut (Alt + Down/Up by default) — no more scrolling and clicking through the list by hand. The review you land on is focused and ready to reply to. Page through the whole review list the same way with Alt + Right/Left. Either way, any unpublished draft you're leaving behind is discarded automatically instead of being left stranded.
+
 ⭐ CUSTOM APP SLUGS
 Map each app's name to your own short slug for use in the copied JSON, matching whatever naming scheme your team already uses.
 
 ⭐ FULLY CUSTOMIZABLE
-Change the quick-reply combo and the parse-review modifier keys from the Options page. Changes save and apply instantly, no reload required.
+Change any of the keyboard shortcuts and the parse-review modifier keys from the Options page. Changes save and apply instantly, no reload required.
 
 ⭐ SAVED SHORTCUTS
 Bookmark any Play Console page from the popup — give it a name and it's one click away next time, from the popup, on any page.
 
 ⭐ SETTINGS SYNC ACROSS DEVICES
-Your shortcuts, auto-translate toggle, app slugs, and saved page bookmarks follow you to any other Chrome profile you're signed into, via Chrome's own sync — no account or setup needed beyond being signed into Chrome.
+Your shortcuts, auto-translate toggle, app slugs, canned reply templates, and saved page bookmarks follow you to any other Chrome profile you're signed into, via Chrome's own sync — no account or setup needed beyond being signed into Chrome.
 
 ⭐ PRIVATE BY DESIGN
-Everything runs locally in your browser against the Play Console page you're already on. No review content or reply text is ever sent anywhere — translation uses Chrome's on-device models, not a cloud service. The extension only stores your own settings (shortcuts, app slugs, saved page bookmarks), via Chrome's built-in sync storage.
+Everything runs locally in your browser against the Play Console page you're already on. No review content or reply text is ever sent anywhere — translation uses Chrome's on-device models, not a cloud service. The extension only stores your own settings (shortcuts, app slugs, canned reply templates, saved page bookmarks), via Chrome's built-in sync storage.
 
 Homepage and docs: https://pcu.visnalize.com
 Source code: https://github.com/Visnalize/play-console-utils

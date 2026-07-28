@@ -5,9 +5,56 @@
     <div class="shortcut-row">
       <span class="shortcut-label">Quick reply (while typing a reply)</span>
       <ShortcutRecorder
-        :model-value="quickReplyShortcut"
+        :model-value="quickReply.current"
         :default-value="DEFAULT_QUICK_REPLY_SHORTCUT"
-        @update:model-value="onQuickReplyChange"
+        @update:model-value="quickReply.onChange"
+      />
+    </div>
+
+    <div class="shortcut-row">
+      <span class="shortcut-label"
+        >Insert canned reply (while typing a reply)</span
+      >
+      <ShortcutRecorder
+        :model-value="cannedReply.current"
+        :default-value="DEFAULT_CANNED_REPLY_SHORTCUT"
+        @update:model-value="cannedReply.onChange"
+      />
+    </div>
+
+    <div class="shortcut-row">
+      <span class="shortcut-label">Next review</span>
+      <ShortcutRecorder
+        :model-value="nextReview.current"
+        :default-value="DEFAULT_NEXT_REVIEW_SHORTCUT"
+        @update:model-value="nextReview.onChange"
+      />
+    </div>
+
+    <div class="shortcut-row">
+      <span class="shortcut-label">Previous review</span>
+      <ShortcutRecorder
+        :model-value="prevReview.current"
+        :default-value="DEFAULT_PREV_REVIEW_SHORTCUT"
+        @update:model-value="prevReview.onChange"
+      />
+    </div>
+
+    <div class="shortcut-row">
+      <span class="shortcut-label">Next review page</span>
+      <ShortcutRecorder
+        :model-value="nextReviewPage.current"
+        :default-value="DEFAULT_NEXT_REVIEW_PAGE_SHORTCUT"
+        @update:model-value="nextReviewPage.onChange"
+      />
+    </div>
+
+    <div class="shortcut-row">
+      <span class="shortcut-label">Previous review page</span>
+      <ShortcutRecorder
+        :model-value="prevReviewPage.current"
+        :default-value="DEFAULT_PREV_REVIEW_PAGE_SHORTCUT"
+        @update:model-value="prevReviewPage.onChange"
       />
     </div>
 
@@ -58,31 +105,31 @@ import { Keyboard, RotateCcw } from '@lucide/vue';
 import ShortcutRecorder from './ShortcutRecorder.vue';
 import {
   autoTranslateReplyItem,
+  cannedReplyShortcutItem,
+  DEFAULT_CANNED_REPLY_SHORTCUT,
+  DEFAULT_NEXT_REVIEW_PAGE_SHORTCUT,
+  DEFAULT_NEXT_REVIEW_SHORTCUT,
   DEFAULT_PARSE_REVIEW_MODIFIER,
+  DEFAULT_PREV_REVIEW_PAGE_SHORTCUT,
+  DEFAULT_PREV_REVIEW_SHORTCUT,
   DEFAULT_QUICK_REPLY_SHORTCUT,
   hasAnyModifier,
+  nextReviewPageShortcutItem,
+  nextReviewShortcutItem,
   parseReviewModifierItem,
+  prevReviewPageShortcutItem,
+  prevReviewShortcutItem,
   quickReplyShortcutItem,
+  type KeyShortcut,
   type ModifierKeys,
-  type QuickReplyShortcut,
 } from '@/utils/shortcuts';
 
-const quickReplyShortcut = ref<QuickReplyShortcut>({
-  ...DEFAULT_QUICK_REPLY_SHORTCUT,
-});
 const parseReviewModifier = reactive<ModifierKeys>({
   ...DEFAULT_PARSE_REVIEW_MODIFIER,
 });
 const autoTranslateReply = ref(true);
 const status = ref('');
 let loaded = false;
-
-onMounted(async () => {
-  quickReplyShortcut.value = await quickReplyShortcutItem.getValue();
-  Object.assign(parseReviewModifier, await parseReviewModifierItem.getValue());
-  autoTranslateReply.value = await autoTranslateReplyItem.getValue();
-  loaded = true;
-});
 
 function flashSaved() {
   status.value = 'Saved';
@@ -91,11 +138,57 @@ function flashSaved() {
   }, 1500);
 }
 
-async function onQuickReplyChange(value: QuickReplyShortcut) {
-  quickReplyShortcut.value = value;
-  await quickReplyShortcutItem.setValue(value);
-  flashSaved();
+function makeShortcutRow(
+  item: { setValue(v: KeyShortcut): Promise<void> },
+  initial: KeyShortcut,
+) {
+  const row = reactive({
+    current: { ...initial } as KeyShortcut,
+    onChange: async (v: KeyShortcut) => {
+      row.current = v;
+      await item.setValue(v);
+      flashSaved();
+    },
+  });
+  return row;
 }
+
+const quickReply = makeShortcutRow(
+  quickReplyShortcutItem,
+  DEFAULT_QUICK_REPLY_SHORTCUT,
+);
+const cannedReply = makeShortcutRow(
+  cannedReplyShortcutItem,
+  DEFAULT_CANNED_REPLY_SHORTCUT,
+);
+const nextReview = makeShortcutRow(
+  nextReviewShortcutItem,
+  DEFAULT_NEXT_REVIEW_SHORTCUT,
+);
+const prevReview = makeShortcutRow(
+  prevReviewShortcutItem,
+  DEFAULT_PREV_REVIEW_SHORTCUT,
+);
+const nextReviewPage = makeShortcutRow(
+  nextReviewPageShortcutItem,
+  DEFAULT_NEXT_REVIEW_PAGE_SHORTCUT,
+);
+const prevReviewPage = makeShortcutRow(
+  prevReviewPageShortcutItem,
+  DEFAULT_PREV_REVIEW_PAGE_SHORTCUT,
+);
+
+onMounted(async () => {
+  quickReply.current = await quickReplyShortcutItem.getValue();
+  cannedReply.current = await cannedReplyShortcutItem.getValue();
+  nextReview.current = await nextReviewShortcutItem.getValue();
+  prevReview.current = await prevReviewShortcutItem.getValue();
+  nextReviewPage.current = await nextReviewPageShortcutItem.getValue();
+  prevReviewPage.current = await prevReviewPageShortcutItem.getValue();
+  Object.assign(parseReviewModifier, await parseReviewModifierItem.getValue());
+  autoTranslateReply.value = await autoTranslateReplyItem.getValue();
+  loaded = true;
+});
 
 function resetParseReviewModifier() {
   Object.assign(parseReviewModifier, DEFAULT_PARSE_REVIEW_MODIFIER);

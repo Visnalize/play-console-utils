@@ -1,11 +1,16 @@
 import { describe, expect, it } from 'vitest';
 import {
+  DEFAULT_CANNED_REPLY_SHORTCUT,
+  DEFAULT_NEXT_REVIEW_PAGE_SHORTCUT,
+  DEFAULT_NEXT_REVIEW_SHORTCUT,
   DEFAULT_PARSE_REVIEW_MODIFIER,
+  DEFAULT_PREV_REVIEW_PAGE_SHORTCUT,
+  DEFAULT_PREV_REVIEW_SHORTCUT,
   DEFAULT_QUICK_REPLY_SHORTCUT,
   formatShortcut,
   hasAnyModifier,
+  matchesKeyShortcut,
   matchesParseReviewModifier,
-  matchesQuickReplyShortcut,
 } from './shortcuts';
 
 function keyEvent(init: Partial<KeyboardEvent>): KeyboardEvent {
@@ -29,16 +34,16 @@ function clickEvent(init: Partial<MouseEvent>): MouseEvent {
   } as MouseEvent;
 }
 
-describe('matchesQuickReplyShortcut', () => {
-  it('matches the default Ctrl/Cmd+Enter combo', () => {
+describe('matchesKeyShortcut', () => {
+  it('matches the default quick-reply Ctrl/Cmd+Enter combo', () => {
     expect(
-      matchesQuickReplyShortcut(
+      matchesKeyShortcut(
         keyEvent({ ctrlKey: true, key: 'Enter' }),
         DEFAULT_QUICK_REPLY_SHORTCUT,
       ),
     ).toBe(true);
     expect(
-      matchesQuickReplyShortcut(
+      matchesKeyShortcut(
         keyEvent({ metaKey: true, key: 'Enter' }),
         DEFAULT_QUICK_REPLY_SHORTCUT,
       ),
@@ -47,7 +52,7 @@ describe('matchesQuickReplyShortcut', () => {
 
   it('rejects when a required modifier is missing', () => {
     expect(
-      matchesQuickReplyShortcut(
+      matchesKeyShortcut(
         keyEvent({ key: 'Enter' }),
         DEFAULT_QUICK_REPLY_SHORTCUT,
       ),
@@ -56,7 +61,7 @@ describe('matchesQuickReplyShortcut', () => {
 
   it('rejects when an extra modifier is held', () => {
     expect(
-      matchesQuickReplyShortcut(
+      matchesKeyShortcut(
         keyEvent({ ctrlKey: true, shiftKey: true, key: 'Enter' }),
         DEFAULT_QUICK_REPLY_SHORTCUT,
       ),
@@ -65,7 +70,7 @@ describe('matchesQuickReplyShortcut', () => {
 
   it('rejects a non-matching key', () => {
     expect(
-      matchesQuickReplyShortcut(
+      matchesKeyShortcut(
         keyEvent({ ctrlKey: true, key: 'k' }),
         DEFAULT_QUICK_REPLY_SHORTCUT,
       ),
@@ -75,9 +80,57 @@ describe('matchesQuickReplyShortcut', () => {
   it('matches a custom shortcut', () => {
     const custom = { ctrlOrMeta: false, shift: true, alt: true, key: 'k' };
     expect(
-      matchesQuickReplyShortcut(
+      matchesKeyShortcut(
         keyEvent({ shiftKey: true, altKey: true, key: 'k' }),
         custom,
+      ),
+    ).toBe(true);
+  });
+
+  it('matches the default canned-reply Ctrl/Cmd+K combo', () => {
+    expect(
+      matchesKeyShortcut(
+        keyEvent({ ctrlKey: true, key: 'k' }),
+        DEFAULT_CANNED_REPLY_SHORTCUT,
+      ),
+    ).toBe(true);
+  });
+
+  it('matches the default next/previous review Alt+Arrow combos', () => {
+    expect(
+      matchesKeyShortcut(
+        keyEvent({ altKey: true, key: 'ArrowDown' }),
+        DEFAULT_NEXT_REVIEW_SHORTCUT,
+      ),
+    ).toBe(true);
+    expect(
+      matchesKeyShortcut(
+        keyEvent({ altKey: true, key: 'ArrowUp' }),
+        DEFAULT_PREV_REVIEW_SHORTCUT,
+      ),
+    ).toBe(true);
+  });
+
+  it('rejects the next-review combo when Alt is missing', () => {
+    expect(
+      matchesKeyShortcut(
+        keyEvent({ key: 'ArrowDown' }),
+        DEFAULT_NEXT_REVIEW_SHORTCUT,
+      ),
+    ).toBe(false);
+  });
+
+  it('matches the default next/previous review-page Alt+Arrow combos', () => {
+    expect(
+      matchesKeyShortcut(
+        keyEvent({ altKey: true, key: 'ArrowRight' }),
+        DEFAULT_NEXT_REVIEW_PAGE_SHORTCUT,
+      ),
+    ).toBe(true);
+    expect(
+      matchesKeyShortcut(
+        keyEvent({ altKey: true, key: 'ArrowLeft' }),
+        DEFAULT_PREV_REVIEW_PAGE_SHORTCUT,
       ),
     ).toBe(true);
   });

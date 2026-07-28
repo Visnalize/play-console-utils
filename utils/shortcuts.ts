@@ -6,11 +6,11 @@ export interface ModifierKeys {
   alt: boolean;
 }
 
-export interface QuickReplyShortcut extends ModifierKeys {
+export interface KeyShortcut extends ModifierKeys {
   key: string;
 }
 
-export const DEFAULT_QUICK_REPLY_SHORTCUT: QuickReplyShortcut = {
+export const DEFAULT_QUICK_REPLY_SHORTCUT: KeyShortcut = {
   ctrlOrMeta: true,
   shift: false,
   alt: false,
@@ -23,7 +23,42 @@ export const DEFAULT_PARSE_REVIEW_MODIFIER: ModifierKeys = {
   alt: true,
 };
 
-export const quickReplyShortcutItem = storage.defineItem<QuickReplyShortcut>(
+export const DEFAULT_CANNED_REPLY_SHORTCUT: KeyShortcut = {
+  ctrlOrMeta: true,
+  shift: false,
+  alt: false,
+  key: 'k',
+};
+
+export const DEFAULT_NEXT_REVIEW_SHORTCUT: KeyShortcut = {
+  ctrlOrMeta: false,
+  shift: false,
+  alt: true,
+  key: 'ArrowDown',
+};
+
+export const DEFAULT_PREV_REVIEW_SHORTCUT: KeyShortcut = {
+  ctrlOrMeta: false,
+  shift: false,
+  alt: true,
+  key: 'ArrowUp',
+};
+
+export const DEFAULT_NEXT_REVIEW_PAGE_SHORTCUT: KeyShortcut = {
+  ctrlOrMeta: false,
+  shift: false,
+  alt: true,
+  key: 'ArrowRight',
+};
+
+export const DEFAULT_PREV_REVIEW_PAGE_SHORTCUT: KeyShortcut = {
+  ctrlOrMeta: false,
+  shift: false,
+  alt: true,
+  key: 'ArrowLeft',
+};
+
+export const quickReplyShortcutItem = storage.defineItem<KeyShortcut>(
   'sync:quickReplyShortcut',
   { fallback: DEFAULT_QUICK_REPLY_SHORTCUT, version: 1 },
 );
@@ -41,13 +76,38 @@ export const autoTranslateReplyItem = storage.defineItem<boolean>(
   { fallback: true, version: 1 },
 );
 
+export const cannedReplyShortcutItem = storage.defineItem<KeyShortcut>(
+  'sync:cannedReplyShortcut',
+  { fallback: DEFAULT_CANNED_REPLY_SHORTCUT, version: 1 },
+);
+
+export const nextReviewShortcutItem = storage.defineItem<KeyShortcut>(
+  'sync:nextReviewShortcut',
+  { fallback: DEFAULT_NEXT_REVIEW_SHORTCUT, version: 1 },
+);
+
+export const prevReviewShortcutItem = storage.defineItem<KeyShortcut>(
+  'sync:prevReviewShortcut',
+  { fallback: DEFAULT_PREV_REVIEW_SHORTCUT, version: 1 },
+);
+
+export const nextReviewPageShortcutItem = storage.defineItem<KeyShortcut>(
+  'sync:nextReviewPageShortcut',
+  { fallback: DEFAULT_NEXT_REVIEW_PAGE_SHORTCUT, version: 1 },
+);
+
+export const prevReviewPageShortcutItem = storage.defineItem<KeyShortcut>(
+  'sync:prevReviewPageShortcut',
+  { fallback: DEFAULT_PREV_REVIEW_PAGE_SHORTCUT, version: 1 },
+);
+
 export function hasAnyModifier(modifier: ModifierKeys): boolean {
   return modifier.ctrlOrMeta || modifier.shift || modifier.alt;
 }
 
-export function matchesQuickReplyShortcut(
+export function matchesKeyShortcut(
   e: KeyboardEvent,
-  shortcut: QuickReplyShortcut,
+  shortcut: KeyShortcut,
 ): boolean {
   return (
     (e.ctrlKey || e.metaKey) === shortcut.ctrlOrMeta &&
