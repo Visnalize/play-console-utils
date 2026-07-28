@@ -1,32 +1,35 @@
 import type { ContentScriptContext } from 'wxt/utils/content-script-context';
-import {
-  cannedReplyShortcutItem,
-  matchesKeyShortcut,
-  type KeyShortcut,
-} from '@/utils/shortcuts';
+import { cannedReplyShortcutItem, matchesKeyShortcut } from '@/utils/shortcuts';
 import {
   cannedRepliesItem,
   fillCannedReplyPlaceholders,
   type CannedReply,
 } from '@/utils/canned-replies';
 import {
-  extractAuthorFromContainer,
-  extractDateFromContainer,
   getActiveAppLabel,
-} from '@/utils/review-fields';
-import { getFocusedReplyField, setReplyText } from './reply-field';
+  getFocusedReplyField,
+  getReviewAuthor,
+  getReviewContainerOf,
+  getReviewDate,
+  setReplyText,
+} from '@/utils/dom';
+import { watchValue } from '@/utils/watch';
 import { showToast } from './toast';
 
-const PANEL_CLASS = 'pcu-canned-reply-picker';
-const ROW_CLASS = 'pcu-canned-reply-picker__row';
+const PANEL_CLASS = 'pcu-picker';
+const ROW_CLASS = 'pcu-picker__row';
+
+// Only the first nine rows get a number key — later templates stay listed and
+// clickable, just unnumbered.
+const NUMBERED_ROWS = 9;
 
 let closeActivePicker: (() => void) | null = null;
 
 function buildPlaceholderData(replyEl: HTMLElement): Record<string, string> {
-  const container = replyEl.closest('.review-container');
+  const container = getReviewContainerOf(replyEl);
   return {
-    author: extractAuthorFromContainer(container),
-    date: extractDateFromContainer(container),
+    author: getReviewAuthor(container),
+    date: getReviewDate(container),
     app: getActiveAppLabel(),
   };
 }
@@ -48,24 +51,28 @@ function openPicker(replyEl: HTMLElement, templates: CannedReply[]) {
   const panel = document.createElement('div');
   panel.className = PANEL_CLASS;
 
+  function close() {
+    window.removeEventListener('keydown', onKeydown, true);
+    document.removeEventListener('click', onDocumentClick, true);
+    panel.remove();
+    closeActivePicker = null;
+  }
+
+  // Replaces the reply field's whole content — it doesn't insert at the cursor
+  // or publish anything.
   function select(template: CannedReply) {
-    const filled = fillCannedReplyPlaceholders(
-      template.content,
-      buildPlaceholderData(replyEl),
+    setReplyText(
+      replyEl,
+      fillCannedReplyPlaceholders(
+        template.content,
+        buildPlaceholderData(replyEl),
+      ),
     );
-    setReplyText(replyEl, filled);
     close();
   }
 
-  templates.forEach((template, i) => {
-    const row = document.createElement('button');
-    row.type = 'button';
-    row.className = ROW_CLASS;
-    row.textContent = i < 9 ? `${i + 1}. ${template.label}` : template.label;
-    row.addEventListener('click', () => select(template));
-    panel.appendChild(row);
-  });
-
+  // Intercepts only Escape and the row digits; every other key passes through
+  // so normal typing and Play Console's own bindings are unaffected.
   function onKeydown(e: KeyboardEvent) {
     if (e.key === 'Escape') {
       e.preventDefault();
@@ -87,12 +94,15 @@ function openPicker(replyEl: HTMLElement, templates: CannedReply[]) {
     if (!panel.contains(e.target as Node)) close();
   }
 
-  function close() {
-    window.removeEventListener('keydown', onKeydown, true);
-    document.removeEventListener('click', onDocumentClick, true);
-    panel.remove();
-    closeActivePicker = null;
-  }
+  templates.forEach((template, i) => {
+    const row = document.createElement('button');
+    row.type = 'button';
+    row.className = ROW_CLASS;
+    row.textContent =
+      i < NUMBERED_ROWS ? `${i + 1}. ${template.label}` : template.label;
+    row.addEventListener('click', () => select(template));
+    panel.appendChild(row);
+  });
 
   document.body.appendChild(panel);
   positionPanel(panel, replyEl);
@@ -102,16 +112,12 @@ function openPicker(replyEl: HTMLElement, templates: CannedReply[]) {
   closeActivePicker = close;
 }
 
-export async function initCannedReplyPicker(ctx: ContentScriptContext) {
-  let shortcut: KeyShortcut = await cannedReplyShortcutItem.getValue();
-  const unwatchShortcut = cannedReplyShortcutItem.watch((value) => {
-    shortcut = value;
-  });
-  ctx.onInvalidated(() => unwatchShortcut());
+export async function initPicker(ctx: ContentScriptContext) {
+  const shortcut = await watchValue(ctx, cannedReplyShortcutItem);
   ctx.onInvalidated(() => closeActivePicker?.());
 
   ctx.addEventListener(window, 'keydown', async (e: KeyboardEvent) => {
-    if (!matchesKeyShortcut(e, shortcut)) return;
+    if (!matchesKeyShortcut(e, shortcut())) return;
 
     const active = getFocusedReplyField();
     if (!active) return;
@@ -126,6 +132,4 @@ export async function initCannedReplyPicker(ctx: ContentScriptContext) {
 
     openPicker(active, templates);
   });
-
-  console.log('Play Console Utils: canned reply picker active.');
 }

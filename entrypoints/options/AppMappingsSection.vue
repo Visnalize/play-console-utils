@@ -19,7 +19,7 @@
         <tr v-for="(row, i) in rows" :key="i">
           <td>
             <input
-              :ref="(el) => setLabelRef(el, i)"
+              :ref="(el) => setFirstInputRef(el, i)"
               v-model="row.label"
               type="text"
               placeholder="e.g. Brick 1100"
@@ -44,7 +44,11 @@
         </tr>
       </tbody>
     </table>
-    <button type="button" class="add-row" @click="addRow">
+    <button
+      type="button"
+      class="add-row"
+      @click="addRow({ label: '', slug: '' })"
+    >
       <Plus :size="16" /> Add mapping
     </button>
     <p role="status" aria-live="polite">{{ status }}</p>
@@ -52,70 +56,21 @@
 </template>
 
 <script setup lang="ts">
-import {
-  nextTick,
-  onMounted,
-  reactive,
-  ref,
-  watch,
-  type ComponentPublicInstance,
-} from 'vue';
+import { onMounted } from 'vue';
 import { Plug, Plus, Trash2 } from '@lucide/vue';
-import { appMappingsItem, type AppMapping } from '@/utils/app-mapping';
+import { appMappingsItem, type AppMapping } from '@/utils/apps';
+import { useEditableList } from './autosave';
 
-const rows = reactive<AppMapping[]>([]);
-const status = ref('');
-const labelInputs: (HTMLInputElement | null)[] = [];
-let saveTimer: ReturnType<typeof setTimeout> | undefined;
-let loaded = false;
+const { rows, status, load, addRow, removeRow, setFirstInputRef } =
+  useEditableList<AppMapping>({
+    item: appMappingsItem,
+    sanitize: (rows) =>
+      rows
+        .map((r) => ({ label: r.label.trim(), slug: r.slug.trim() }))
+        .filter((r) => r.label !== '' && r.slug !== ''),
+    quotaMessage:
+      'Save failed — you may have too many mappings for Chrome sync storage. Remove some and try again.',
+  });
 
-function setLabelRef(el: Element | ComponentPublicInstance | null, i: number) {
-  labelInputs[i] = el instanceof HTMLInputElement ? el : null;
-}
-
-onMounted(async () => {
-  const saved = await appMappingsItem.getValue();
-  rows.push(...saved.map((m) => ({ ...m })));
-  loaded = true;
-});
-
-function addRow() {
-  rows.push({ label: '', slug: '' });
-  void nextTick(() => labelInputs[rows.length - 1]?.focus());
-}
-
-async function persist() {
-  const cleaned = rows
-    .map((r) => ({ label: r.label.trim(), slug: r.slug.trim() }))
-    .filter((r) => r.label !== '' && r.slug !== '');
-  try {
-    await appMappingsItem.setValue(cleaned);
-    status.value = 'Saved';
-    setTimeout(() => {
-      if (status.value === 'Saved') status.value = '';
-    }, 1500);
-  } catch (err) {
-    // chrome.storage.sync caps each item at 8KB — a large mapping list can exceed
-    // that even though the equivalent chrome.storage.local write always succeeded.
-    console.error('Play Console Utils: failed to save app mappings.', err);
-    status.value =
-      'Save failed — you may have too many mappings for Chrome sync storage. Remove some and try again.';
-  }
-}
-
-function removeRow(i: number) {
-  rows.splice(i, 1);
-  clearTimeout(saveTimer);
-  void persist();
-}
-
-watch(
-  rows,
-  () => {
-    if (!loaded) return;
-    clearTimeout(saveTimer);
-    saveTimer = setTimeout(() => void persist(), 400);
-  },
-  { deep: true },
-);
+onMounted(load);
 </script>

@@ -3,29 +3,29 @@ import {
   autoTranslateReplyItem,
   matchesKeyShortcut,
   quickReplyShortcutItem,
-  type KeyShortcut,
 } from '@/utils/shortcuts';
-import {
-  ORIGINAL_LANGUAGE_HEADER_SELECTOR,
-  extractTargetLanguageCode,
-} from '@/utils/review-language';
+import { extractTargetLanguageCode } from '@/utils/language';
 import {
   detectLanguage,
   isTranslationSupported,
   languagesMatch,
   translateText,
 } from '@/utils/translation';
+import {
+  findButtonByText,
+  flashPublished,
+  getFocusedReplyField,
+  getReplyText,
+  getReviewContainerOf,
+  isButtonDisabled,
+  setReplyText,
+} from '@/utils/dom';
+import { ORIGINAL_LANGUAGE_HEADER, PUBLISH_LABELS } from '@/utils/selectors';
+import { watchValue } from '@/utils/watch';
 import { showToast } from './toast';
-import { getFocusedReplyField, getReplyText, setReplyText } from './reply-field';
-import { findButtonByText, isButtonDisabled } from './button-finder';
 
 function findPublishButton(): HTMLElement | undefined {
-  return findButtonByText(document, [
-    'publish reply',
-    'publish',
-    'enviar',
-    'responder',
-  ]);
+  return findButtonByText(document, PUBLISH_LABELS);
 }
 
 // Setting the reply's content programmatically still routes through Play
@@ -50,9 +50,9 @@ async function translateReplyToReviewLanguage(
 ): Promise<boolean> {
   if (!isTranslationSupported()) return false;
 
-  const headerText = active
-    .closest('.review-container')
-    ?.querySelector(ORIGINAL_LANGUAGE_HEADER_SELECTOR)?.textContent;
+  const headerText = getReviewContainerOf(active)?.querySelector(
+    ORIGINAL_LANGUAGE_HEADER,
+  )?.textContent;
   const targetLanguage = extractTargetLanguageCode(headerText);
   if (!targetLanguage) return false;
 
@@ -83,27 +83,18 @@ async function translateReplyToReviewLanguage(
 }
 
 export async function initQuickReply(ctx: ContentScriptContext) {
-  let shortcut: KeyShortcut = await quickReplyShortcutItem.getValue();
-  const unwatchShortcut = quickReplyShortcutItem.watch((value) => {
-    shortcut = value;
-  });
-  ctx.onInvalidated(() => unwatchShortcut());
-
-  let autoTranslate = await autoTranslateReplyItem.getValue();
-  const unwatchAutoTranslate = autoTranslateReplyItem.watch((value) => {
-    autoTranslate = value;
-  });
-  ctx.onInvalidated(() => unwatchAutoTranslate());
+  const shortcut = await watchValue(ctx, quickReplyShortcutItem);
+  const autoTranslate = await watchValue(ctx, autoTranslateReplyItem);
 
   ctx.addEventListener(window, 'keydown', async (e: KeyboardEvent) => {
-    if (!matchesKeyShortcut(e, shortcut)) return;
+    if (!matchesKeyShortcut(e, shortcut())) return;
 
     const active = getFocusedReplyField();
     if (!active) return;
 
     e.preventDefault();
 
-    const translated = autoTranslate
+    const translated = autoTranslate()
       ? await translateReplyToReviewLanguage(active)
       : false;
 
@@ -122,14 +113,6 @@ export async function initQuickReply(ctx: ContentScriptContext) {
     }
 
     publishBtn.click();
-    publishBtn.style.transition = 'all 0.2s ease';
-    publishBtn.style.backgroundColor = '#2e7d32';
-    publishBtn.style.color = '#ffffff';
-    publishBtn.style.transform = 'scale(0.95)';
-    setTimeout(() => {
-      publishBtn.style.transform = 'none';
-    }, 200);
+    flashPublished(publishBtn);
   });
-
-  console.log('Play Console Utils: quick reply shortcut active.');
 }

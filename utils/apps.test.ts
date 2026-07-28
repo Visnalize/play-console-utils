@@ -1,6 +1,6 @@
 import { describe, expect, it, beforeEach } from 'vitest';
 import { fakeBrowser } from 'wxt/testing/fake-browser';
-import { appMappingsItem, resolveAppSlug, slugify } from './app-mapping';
+import { appMappingsItem, resolveAppSlug, slugify } from './apps';
 
 describe('slugify', () => {
   it('lowercases and hyphenates', () => {

@@ -1,56 +1,53 @@
 import type { ContentScriptContext } from 'wxt/utils/content-script-context';
-import { resolveAppSlug } from '@/utils/app-mapping';
+import { resolveAppSlug } from '@/utils/apps';
 import {
   matchesParseReviewModifier,
   parseReviewModifierItem,
-  type ModifierKeys,
 } from '@/utils/shortcuts';
 import {
-  extractAuthorFromContainer,
-  extractDateFromContainer,
+  flashHighlight,
   getActiveAppLabel,
-} from '@/utils/review-fields';
+  getReviewAuthor,
+  getReviewAvatarUrl,
+  getReviewContainerOf,
+  getReviewDate,
+} from '@/utils/dom';
+import { watchValue } from '@/utils/watch';
 import { showToast } from './toast';
-import { flashHighlight } from './highlight';
+
+// Google's image URLs take a size suffix; s50 keeps the copied avatar small.
+const AVATAR_SIZE_SUFFIX = '=s50';
 
 export async function initParseReview(ctx: ContentScriptContext) {
-  let modifier: ModifierKeys = await parseReviewModifierItem.getValue();
-  const unwatch = parseReviewModifierItem.watch((value) => {
-    modifier = value;
-  });
-  ctx.onInvalidated(() => unwatch());
+  const modifier = await watchValue(ctx, parseReviewModifierItem);
 
   ctx.addEventListener(
     document,
     'click',
     async (e: MouseEvent) => {
-      if (!matchesParseReviewModifier(e, modifier)) return;
+      if (!matchesParseReviewModifier(e, modifier())) return;
       e.preventDefault();
       e.stopPropagation();
 
       const target = e.target as HTMLElement;
-      const { slug: appName, matched } = await resolveAppSlug(
-        getActiveAppLabel(),
-      );
+      const { slug: appName, matched } =
+        await resolveAppSlug(getActiveAppLabel());
 
-      const reviewContainer = target.closest('.review-container');
-      if (reviewContainer) flashHighlight(reviewContainer);
+      const container = getReviewContainerOf(target);
+      if (container) flashHighlight(container);
 
-      const avatar =
-        reviewContainer?.querySelector<HTMLImageElement>('.review-avatar');
-      const author = extractAuthorFromContainer(reviewContainer);
-      const dateStr = extractDateFromContainer(reviewContainer);
-      const content = target.innerText.trim();
+      const author = getReviewAuthor(container);
+      const avatarUrl = getReviewAvatarUrl(container);
 
       const data: Record<string, string> = {
         author,
-        date: dateStr,
+        date: getReviewDate(container),
         app: appName,
-        content,
+        content: target.innerText.trim(),
       };
 
-      if (avatar) {
-        data.image = `${avatar.src}=s50`;
+      if (avatarUrl) {
+        data.image = `${avatarUrl}${AVATAR_SIZE_SUFFIX}`;
       }
 
       await navigator.clipboard.writeText(JSON.stringify(data, null, 2));
@@ -63,6 +60,4 @@ export async function initParseReview(ctx: ContentScriptContext) {
     },
     { capture: true },
   );
-
-  console.log('Play Console Utils: review parser shortcut active.');
 }

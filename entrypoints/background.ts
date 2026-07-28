@@ -1,5 +1,5 @@
 import { isConsoleUrl } from '@/utils/console-url';
-import { migrateLocalSettingsToSync } from '@/utils/storage-migration';
+import { migrateLocalSettingsToSync } from '@/utils/migration';
 
 const ACTIVE_ICON = {
   16: '/icons/icon16.png',

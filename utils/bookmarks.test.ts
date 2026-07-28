@@ -1,6 +1,6 @@
 import { describe, expect, it, beforeEach } from 'vitest';
 import { fakeBrowser } from 'wxt/testing/fake-browser';
-import { createPageBookmark, pageBookmarksItem } from './page-bookmarks';
+import { createPageBookmark, pageBookmarksItem } from './bookmarks';
 
 describe('createPageBookmark', () => {
   it('trims the label and keeps the url as-is', () => {

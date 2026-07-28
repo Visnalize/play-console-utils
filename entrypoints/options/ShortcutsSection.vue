@@ -2,59 +2,12 @@
   <section>
     <h2><Keyboard :size="16" /> Keyboard shortcuts</h2>
 
-    <div class="shortcut-row">
-      <span class="shortcut-label">Quick reply (while typing a reply)</span>
+    <div v-for="row in keyShortcutRows" :key="row.label" class="shortcut-row">
+      <span class="shortcut-label">{{ row.label }}</span>
       <ShortcutRecorder
-        :model-value="quickReply.current"
-        :default-value="DEFAULT_QUICK_REPLY_SHORTCUT"
-        @update:model-value="quickReply.onChange"
-      />
-    </div>
-
-    <div class="shortcut-row">
-      <span class="shortcut-label"
-        >Insert canned reply (while typing a reply)</span
-      >
-      <ShortcutRecorder
-        :model-value="cannedReply.current"
-        :default-value="DEFAULT_CANNED_REPLY_SHORTCUT"
-        @update:model-value="cannedReply.onChange"
-      />
-    </div>
-
-    <div class="shortcut-row">
-      <span class="shortcut-label">Next review</span>
-      <ShortcutRecorder
-        :model-value="nextReview.current"
-        :default-value="DEFAULT_NEXT_REVIEW_SHORTCUT"
-        @update:model-value="nextReview.onChange"
-      />
-    </div>
-
-    <div class="shortcut-row">
-      <span class="shortcut-label">Previous review</span>
-      <ShortcutRecorder
-        :model-value="prevReview.current"
-        :default-value="DEFAULT_PREV_REVIEW_SHORTCUT"
-        @update:model-value="prevReview.onChange"
-      />
-    </div>
-
-    <div class="shortcut-row">
-      <span class="shortcut-label">Next review page</span>
-      <ShortcutRecorder
-        :model-value="nextReviewPage.current"
-        :default-value="DEFAULT_NEXT_REVIEW_PAGE_SHORTCUT"
-        @update:model-value="nextReviewPage.onChange"
-      />
-    </div>
-
-    <div class="shortcut-row">
-      <span class="shortcut-label">Previous review page</span>
-      <ShortcutRecorder
-        :model-value="prevReviewPage.current"
-        :default-value="DEFAULT_PREV_REVIEW_PAGE_SHORTCUT"
-        @update:model-value="prevReviewPage.onChange"
+        :model-value="row.current"
+        :default-value="row.fallback"
+        @update:model-value="row.onChange"
       />
     </div>
 
@@ -103,6 +56,7 @@
 import { onMounted, reactive, ref, watch } from 'vue';
 import { Keyboard, RotateCcw } from '@lucide/vue';
 import ShortcutRecorder from './ShortcutRecorder.vue';
+import { useSaveStatus } from './autosave';
 import {
   autoTranslateReplyItem,
   cannedReplyShortcutItem,
@@ -124,67 +78,76 @@ import {
   type ModifierKeys,
 } from '@/utils/shortcuts';
 
+interface ShortcutItem {
+  getValue(): Promise<KeyShortcut>;
+  setValue(value: KeyShortcut): Promise<void>;
+}
+
+const { status, flashSaved } = useSaveStatus();
 const parseReviewModifier = reactive<ModifierKeys>({
   ...DEFAULT_PARSE_REVIEW_MODIFIER,
 });
 const autoTranslateReply = ref(true);
-const status = ref('');
 let loaded = false;
 
-function flashSaved() {
-  status.value = 'Saved';
-  setTimeout(() => {
-    if (status.value === 'Saved') status.value = '';
-  }, 1500);
-}
-
 function makeShortcutRow(
-  item: { setValue(v: KeyShortcut): Promise<void> },
-  initial: KeyShortcut,
+  label: string,
+  item: ShortcutItem,
+  fallback: KeyShortcut,
 ) {
   const row = reactive({
-    current: { ...initial } as KeyShortcut,
-    onChange: async (v: KeyShortcut) => {
-      row.current = v;
-      await item.setValue(v);
+    label,
+    item,
+    fallback,
+    current: { ...fallback } as KeyShortcut,
+    onChange: async (value: KeyShortcut) => {
+      row.current = value;
+      await item.setValue(value);
       flashSaved();
     },
   });
   return row;
 }
 
-const quickReply = makeShortcutRow(
-  quickReplyShortcutItem,
-  DEFAULT_QUICK_REPLY_SHORTCUT,
-);
-const cannedReply = makeShortcutRow(
-  cannedReplyShortcutItem,
-  DEFAULT_CANNED_REPLY_SHORTCUT,
-);
-const nextReview = makeShortcutRow(
-  nextReviewShortcutItem,
-  DEFAULT_NEXT_REVIEW_SHORTCUT,
-);
-const prevReview = makeShortcutRow(
-  prevReviewShortcutItem,
-  DEFAULT_PREV_REVIEW_SHORTCUT,
-);
-const nextReviewPage = makeShortcutRow(
-  nextReviewPageShortcutItem,
-  DEFAULT_NEXT_REVIEW_PAGE_SHORTCUT,
-);
-const prevReviewPage = makeShortcutRow(
-  prevReviewPageShortcutItem,
-  DEFAULT_PREV_REVIEW_PAGE_SHORTCUT,
-);
+const keyShortcutRows = [
+  makeShortcutRow(
+    'Quick reply (while typing a reply)',
+    quickReplyShortcutItem,
+    DEFAULT_QUICK_REPLY_SHORTCUT,
+  ),
+  makeShortcutRow(
+    'Insert canned reply (while typing a reply)',
+    cannedReplyShortcutItem,
+    DEFAULT_CANNED_REPLY_SHORTCUT,
+  ),
+  makeShortcutRow(
+    'Next review',
+    nextReviewShortcutItem,
+    DEFAULT_NEXT_REVIEW_SHORTCUT,
+  ),
+  makeShortcutRow(
+    'Previous review',
+    prevReviewShortcutItem,
+    DEFAULT_PREV_REVIEW_SHORTCUT,
+  ),
+  makeShortcutRow(
+    'Next review page',
+    nextReviewPageShortcutItem,
+    DEFAULT_NEXT_REVIEW_PAGE_SHORTCUT,
+  ),
+  makeShortcutRow(
+    'Previous review page',
+    prevReviewPageShortcutItem,
+    DEFAULT_PREV_REVIEW_PAGE_SHORTCUT,
+  ),
+];
 
 onMounted(async () => {
-  quickReply.current = await quickReplyShortcutItem.getValue();
-  cannedReply.current = await cannedReplyShortcutItem.getValue();
-  nextReview.current = await nextReviewShortcutItem.getValue();
-  prevReview.current = await prevReviewShortcutItem.getValue();
-  nextReviewPage.current = await nextReviewPageShortcutItem.getValue();
-  prevReviewPage.current = await prevReviewPageShortcutItem.getValue();
+  await Promise.all(
+    keyShortcutRows.map(async (row) => {
+      row.current = await row.item.getValue();
+    }),
+  );
   Object.assign(parseReviewModifier, await parseReviewModifierItem.getValue());
   autoTranslateReply.value = await autoTranslateReplyItem.getValue();
   loaded = true;
@@ -194,6 +157,8 @@ function resetParseReviewModifier() {
   Object.assign(parseReviewModifier, DEFAULT_PARSE_REVIEW_MODIFIER);
 }
 
+// An all-unchecked modifier set would silently disable parsing, so it's shown
+// as a warning instead of being saved.
 watch(
   parseReviewModifier,
   async () => {

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { extractTargetLanguageCode } from './review-language';
+import { extractTargetLanguageCode } from './language';
 
 describe('extractTargetLanguageCode', () => {
   it('maps the "Translated from X -" banner to a language code', () => {

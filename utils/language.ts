@@ -1,7 +1,8 @@
-// Play Console's "Translated from X -" banner spells out the language in
-// English (see utils/review-language.ts). Maps those names to BCP-47 codes
-// for the built-in Translator/LanguageDetector APIs (utils/translation.ts).
-export const LANGUAGE_NAME_TO_CODE: Record<string, string> = {
+// Play Console's "Translated from X -" banner spells the review's original
+// language out in English; the built-in Translator/LanguageDetector APIs
+// (utils/translation.ts) want BCP-47 codes. This module owns both halves of
+// that hop: the name→code table and the banner parser.
+const LANGUAGE_NAME_TO_CODE: Record<string, string> = {
   Afrikaans: 'af',
   Albanian: 'sq',
   Amharic: 'am',
@@ -116,4 +117,18 @@ export const LANGUAGE_NAME_TO_CODE: Record<string, string> = {
 
 export function getLanguageCodeFromName(name: string): string | null {
   return LANGUAGE_NAME_TO_CODE[name.trim()] ?? null;
+}
+
+const TRANSLATED_FROM_RE = /Translated from\s+(.+?)\s*-\s*$/i;
+
+// Play Console only renders this banner when the review's original language
+// differs from the console's display language, so its absence means the
+// review is already in the console's language — treated by callers as "no
+// translation needed", not as a detection failure.
+export function extractTargetLanguageCode(
+  headerText: string | null | undefined,
+): string | null {
+  const match = headerText?.trim().match(TRANSLATED_FROM_RE);
+  if (!match) return null;
+  return getLanguageCodeFromName(match[1]);
 }

@@ -18,7 +18,7 @@
         <tr v-for="(row, i) in rows" :key="row.id">
           <td>
             <input
-              :ref="(el) => setLabelRef(el, i)"
+              :ref="(el) => setFirstInputRef(el, i)"
               v-model="row.label"
               type="text"
               placeholder="e.g. Already fixed"
@@ -43,7 +43,11 @@
         </tr>
       </tbody>
     </table>
-    <button type="button" class="add-row" @click="addRow">
+    <button
+      type="button"
+      class="add-row"
+      @click="addRow(createCannedReply('', ''))"
+    >
       <Plus :size="16" /> Add canned reply
     </button>
     <p role="status" aria-live="polite">{{ status }}</p>
@@ -51,75 +55,29 @@
 </template>
 
 <script setup lang="ts">
-import {
-  nextTick,
-  onMounted,
-  reactive,
-  ref,
-  watch,
-  type ComponentPublicInstance,
-} from 'vue';
+import { onMounted } from 'vue';
 import { MessageSquareQuote, Plus, Trash2 } from '@lucide/vue';
 import {
   cannedRepliesItem,
   createCannedReply,
   type CannedReply,
 } from '@/utils/canned-replies';
+import { useEditableList } from './autosave';
 
-const rows = reactive<CannedReply[]>([]);
-const status = ref('');
-const labelInputs: (HTMLInputElement | null)[] = [];
-let saveTimer: ReturnType<typeof setTimeout> | undefined;
-let loaded = false;
+const { rows, status, load, addRow, removeRow, setFirstInputRef } =
+  useEditableList<CannedReply>({
+    item: cannedRepliesItem,
+    sanitize: (rows) =>
+      rows
+        .map((r) => ({
+          id: r.id,
+          label: r.label.trim(),
+          content: r.content.trim(),
+        }))
+        .filter((r) => r.label !== ''),
+    quotaMessage:
+      'Save failed — you may have too many canned replies for Chrome sync storage. Remove some and try again.',
+  });
 
-function setLabelRef(el: Element | ComponentPublicInstance | null, i: number) {
-  labelInputs[i] = el instanceof HTMLInputElement ? el : null;
-}
-
-onMounted(async () => {
-  const saved = await cannedRepliesItem.getValue();
-  rows.push(...saved.map((r) => ({ ...r })));
-  loaded = true;
-});
-
-function addRow() {
-  rows.push(createCannedReply('', ''));
-  void nextTick(() => labelInputs[rows.length - 1]?.focus());
-}
-
-async function persist() {
-  const cleaned = rows
-    .map((r) => ({ id: r.id, label: r.label.trim(), content: r.content.trim() }))
-    .filter((r) => r.label !== '');
-  try {
-    await cannedRepliesItem.setValue(cleaned);
-    status.value = 'Saved';
-    setTimeout(() => {
-      if (status.value === 'Saved') status.value = '';
-    }, 1500);
-  } catch (err) {
-    // chrome.storage.sync caps each item at 8KB — a large template library
-    // can exceed that even though the equivalent chrome.storage.local write
-    // always succeeded.
-    console.error('Play Console Utils: failed to save canned replies.', err);
-    status.value =
-      'Save failed — you may have too many canned replies for Chrome sync storage. Remove some and try again.';
-  }
-}
-
-function removeRow(i: number) {
-  rows.splice(i, 1);
-  clearTimeout(saveTimer);
-  void persist();
-}
-
-watch(
-  rows,
-  () => {
-    if (!loaded) return;
-    clearTimeout(saveTimer);
-    saveTimer = setTimeout(() => void persist(), 400);
-  },
-  { deep: true },
-);
+onMounted(load);
 </script>

@@ -4,7 +4,7 @@ import {
   parseReviewModifierItem,
   quickReplyShortcutItem,
 } from './shortcuts';
-import { appMappingsItem } from './app-mapping';
+import { appMappingsItem } from './apps';
 
 // Settings used to live in chrome.storage.local (per-device). They now live in
 // chrome.storage.sync (roams with the user's Chrome profile). This copies any

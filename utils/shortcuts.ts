@@ -10,65 +10,93 @@ export interface KeyShortcut extends ModifierKeys {
   key: string;
 }
 
-export const DEFAULT_QUICK_REPLY_SHORTCUT: KeyShortcut = {
-  ctrlOrMeta: true,
+const NO_MODIFIERS: ModifierKeys = {
+  ctrlOrMeta: false,
   shift: false,
   alt: false,
+};
+
+export const DEFAULT_QUICK_REPLY_SHORTCUT: KeyShortcut = {
+  ...NO_MODIFIERS,
+  ctrlOrMeta: true,
   key: 'Enter',
 };
 
-export const DEFAULT_PARSE_REVIEW_MODIFIER: ModifierKeys = {
-  ctrlOrMeta: false,
-  shift: false,
-  alt: true,
-};
-
 export const DEFAULT_CANNED_REPLY_SHORTCUT: KeyShortcut = {
+  ...NO_MODIFIERS,
   ctrlOrMeta: true,
-  shift: false,
-  alt: false,
   key: 'k',
 };
 
 export const DEFAULT_NEXT_REVIEW_SHORTCUT: KeyShortcut = {
-  ctrlOrMeta: false,
-  shift: false,
+  ...NO_MODIFIERS,
   alt: true,
   key: 'ArrowDown',
 };
 
 export const DEFAULT_PREV_REVIEW_SHORTCUT: KeyShortcut = {
-  ctrlOrMeta: false,
-  shift: false,
+  ...NO_MODIFIERS,
   alt: true,
   key: 'ArrowUp',
 };
 
 export const DEFAULT_NEXT_REVIEW_PAGE_SHORTCUT: KeyShortcut = {
-  ctrlOrMeta: false,
-  shift: false,
+  ...NO_MODIFIERS,
   alt: true,
   key: 'ArrowRight',
 };
 
 export const DEFAULT_PREV_REVIEW_PAGE_SHORTCUT: KeyShortcut = {
-  ctrlOrMeta: false,
-  shift: false,
+  ...NO_MODIFIERS,
   alt: true,
   key: 'ArrowLeft',
 };
 
-export const quickReplyShortcutItem = storage.defineItem<KeyShortcut>(
-  'sync:quickReplyShortcut',
-  { fallback: DEFAULT_QUICK_REPLY_SHORTCUT, version: 1 },
+export const DEFAULT_PARSE_REVIEW_MODIFIER: ModifierKeys = {
+  ...NO_MODIFIERS,
+  alt: true,
+};
+
+function defineShortcut(key: string, fallback: KeyShortcut) {
+  return storage.defineItem<KeyShortcut>(`sync:${key}`, {
+    fallback,
+    version: 1,
+  });
+}
+
+export const quickReplyShortcutItem = defineShortcut(
+  'quickReplyShortcut',
+  DEFAULT_QUICK_REPLY_SHORTCUT,
+);
+
+export const cannedReplyShortcutItem = defineShortcut(
+  'cannedReplyShortcut',
+  DEFAULT_CANNED_REPLY_SHORTCUT,
+);
+
+export const nextReviewShortcutItem = defineShortcut(
+  'nextReviewShortcut',
+  DEFAULT_NEXT_REVIEW_SHORTCUT,
+);
+
+export const prevReviewShortcutItem = defineShortcut(
+  'prevReviewShortcut',
+  DEFAULT_PREV_REVIEW_SHORTCUT,
+);
+
+export const nextReviewPageShortcutItem = defineShortcut(
+  'nextReviewPageShortcut',
+  DEFAULT_NEXT_REVIEW_PAGE_SHORTCUT,
+);
+
+export const prevReviewPageShortcutItem = defineShortcut(
+  'prevReviewPageShortcut',
+  DEFAULT_PREV_REVIEW_PAGE_SHORTCUT,
 );
 
 export const parseReviewModifierItem = storage.defineItem<ModifierKeys>(
   'sync:parseReviewModifier',
-  {
-    fallback: DEFAULT_PARSE_REVIEW_MODIFIER,
-    version: 1,
-  },
+  { fallback: DEFAULT_PARSE_REVIEW_MODIFIER, version: 1 },
 );
 
 export const autoTranslateReplyItem = storage.defineItem<boolean>(
@@ -76,57 +104,35 @@ export const autoTranslateReplyItem = storage.defineItem<boolean>(
   { fallback: true, version: 1 },
 );
 
-export const cannedReplyShortcutItem = storage.defineItem<KeyShortcut>(
-  'sync:cannedReplyShortcut',
-  { fallback: DEFAULT_CANNED_REPLY_SHORTCUT, version: 1 },
-);
-
-export const nextReviewShortcutItem = storage.defineItem<KeyShortcut>(
-  'sync:nextReviewShortcut',
-  { fallback: DEFAULT_NEXT_REVIEW_SHORTCUT, version: 1 },
-);
-
-export const prevReviewShortcutItem = storage.defineItem<KeyShortcut>(
-  'sync:prevReviewShortcut',
-  { fallback: DEFAULT_PREV_REVIEW_SHORTCUT, version: 1 },
-);
-
-export const nextReviewPageShortcutItem = storage.defineItem<KeyShortcut>(
-  'sync:nextReviewPageShortcut',
-  { fallback: DEFAULT_NEXT_REVIEW_PAGE_SHORTCUT, version: 1 },
-);
-
-export const prevReviewPageShortcutItem = storage.defineItem<KeyShortcut>(
-  'sync:prevReviewPageShortcut',
-  { fallback: DEFAULT_PREV_REVIEW_PAGE_SHORTCUT, version: 1 },
-);
-
 export function hasAnyModifier(modifier: ModifierKeys): boolean {
   return modifier.ctrlOrMeta || modifier.shift || modifier.alt;
+}
+
+// Modifier matching is exact on every flag, so distinct configured combos
+// can't collide with each other.
+function matchesModifiers(
+  e: KeyboardEvent | MouseEvent,
+  modifier: ModifierKeys,
+): boolean {
+  return (
+    (e.ctrlKey || e.metaKey) === modifier.ctrlOrMeta &&
+    e.shiftKey === modifier.shift &&
+    e.altKey === modifier.alt
+  );
 }
 
 export function matchesKeyShortcut(
   e: KeyboardEvent,
   shortcut: KeyShortcut,
 ): boolean {
-  return (
-    (e.ctrlKey || e.metaKey) === shortcut.ctrlOrMeta &&
-    e.shiftKey === shortcut.shift &&
-    e.altKey === shortcut.alt &&
-    e.key === shortcut.key
-  );
+  return matchesModifiers(e, shortcut) && e.key === shortcut.key;
 }
 
 export function matchesParseReviewModifier(
   e: MouseEvent,
   modifier: ModifierKeys,
 ): boolean {
-  return (
-    hasAnyModifier(modifier) &&
-    (e.ctrlKey || e.metaKey) === modifier.ctrlOrMeta &&
-    e.shiftKey === modifier.shift &&
-    e.altKey === modifier.alt
-  );
+  return hasAnyModifier(modifier) && matchesModifiers(e, modifier);
 }
 
 export function formatShortcut(

@@ -43,9 +43,7 @@ describe('fillCannedReplyPlaceholders', () => {
   });
 
   it('is a no-op on a template with no placeholders', () => {
-    expect(fillCannedReplyPlaceholders('Hello there', {})).toBe(
-      'Hello there',
-    );
+    expect(fillCannedReplyPlaceholders('Hello there', {})).toBe('Hello there');
   });
 });
 

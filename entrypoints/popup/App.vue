@@ -112,7 +112,7 @@ import {
   createPageBookmark,
   pageBookmarksItem,
   type PageBookmark,
-} from '@/utils/page-bookmarks';
+} from '@/utils/bookmarks';
 import {
   BookmarkCheck,
   BookmarkPlus,

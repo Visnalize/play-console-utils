@@ -57,7 +57,9 @@ button {
   cursor: pointer;
 }
 
-td button[aria-label='Remove mapping'] {
+/* Every editable-list row's remove button — matched on the label prefix so a
+   new list section is styled without touching this rule. */
+td button[aria-label^='Remove'] {
   display: inline-flex;
   align-items: center;
   background: none;
