@@ -8,6 +8,19 @@ All notable changes to Play Console Utils are documented in this file.
 
 <!-- changelog-insert -->
 
+## [1.2.0] - 2026-07-28
+
+- feat: enhance popup and options page UI (1dacf6e)
+- refactor: major codebase cleanup and restructure (6d52cdd)
+- feat: add canned reply templates and review navigation shortcuts (be346a1)
+- chore: disable unused Vue configs (bb3b081)
+- feat: play console page bookmarking (c2c9f29)
+- feat: settings cross-device sync (b41093d)
+- docs: add homepage (97a2702)
+
+**Full Changelog**: https://github.com/Visnalize/play-console-utils/compare/v1.1.1...v1.2.0
+
+
 ## [1.1.1] - 2026-07-27
 
 - chore: add store listing assets (2e51dfa)
