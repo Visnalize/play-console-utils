@@ -1,6 +1,6 @@
 <template>
   <section>
-    <h2>Keyboard shortcuts</h2>
+    <h2><Keyboard :size="16" /> Keyboard shortcuts</h2>
 
     <div class="shortcut-row">
       <span class="shortcut-label">Quick reply (while typing a reply)</span>
@@ -15,20 +15,23 @@
       <span class="shortcut-label"
         >Parse review (modifier + click on review text)</span
       >
-      <label
-        ><input v-model="parseReviewModifier.ctrlOrMeta" type="checkbox" />
-        Ctrl/⌘</label
-      >
-      <label
-        ><input v-model="parseReviewModifier.shift" type="checkbox" />
-        Shift</label
-      >
-      <label
-        ><input v-model="parseReviewModifier.alt" type="checkbox" /> Alt</label
-      >
-      <button type="button" class="reset" @click="resetParseReviewModifier">
-        Reset
-      </button>
+      <span class="shortcut-modifiers">
+        <label
+          ><input v-model="parseReviewModifier.ctrlOrMeta" type="checkbox" />
+          Ctrl/⌘</label
+        >
+        <label
+          ><input v-model="parseReviewModifier.shift" type="checkbox" />
+          Shift</label
+        >
+        <label
+          ><input v-model="parseReviewModifier.alt" type="checkbox" />
+          Alt</label
+        >
+        <button type="button" class="reset" @click="resetParseReviewModifier">
+          <RotateCcw :size="14" /> Reset
+        </button>
+      </span>
     </div>
     <p v-if="!hasAnyModifier(parseReviewModifier)" class="warning">
       Select at least one modifier — parsing stays off until you do.
@@ -51,6 +54,7 @@
 
 <script setup lang="ts">
 import { onMounted, reactive, ref, watch } from 'vue';
+import { Keyboard, RotateCcw } from '@lucide/vue';
 import ShortcutRecorder from './ShortcutRecorder.vue';
 import {
   autoTranslateReplyItem,

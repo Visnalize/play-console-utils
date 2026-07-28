@@ -74,7 +74,7 @@ These settings originally lived in `chrome.storage.local` (per-device); `utils/s
 
 ### Shared Play Console URL matcher
 
-`utils/console-url.ts` exports `CONSOLE_URL_MATCH_PATTERN` (`https://play.google.com/console/*`) and `isConsoleUrl()`. It's the single source of truth for "is this a Play Console page" — used by the content script's `matches`, the background script's icon logic, and the popup's guidance-vs-links check. Don't hardcode the pattern or a second URL check elsewhere.
+`utils/console-url.ts` exports `CONSOLE_URL_MATCH_PATTERN` (`https://play.google.com/console/*`) and `isConsoleUrl()`. It's the single source of truth for "is this a Play Console page" — used by the content script's `matches`, the background script's icon logic, and the popup's guidance-vs-bookmark-control check. Don't hardcode the pattern or a second URL check elsewhere.
 
 ### Background script keeps the toolbar icon in sync
 
@@ -84,7 +84,17 @@ These settings originally lived in `chrome.storage.local` (per-device); `utils/s
 
 ### Popup
 
-`entrypoints/popup/` (Vue, same `@wxt-dev/module-vue` setup as options). On mount it queries the active tab (`browser.tabs.query({active: true, currentWindow: true})`) and branches on `isConsoleUrl(tab.url)`: off Play Console it shows a short guidance message; on Play Console it shows an "Options" button (`browser.runtime.openOptionsPage()`), a docs link to `pcu.visnalize.com`, and a "By Visnalize" credit footer linking to `visnalize.com`.
+`entrypoints/popup/` (Vue, same `@wxt-dev/module-vue` setup as options). On mount it queries the active tab (`browser.tabs.query({active: true, currentWindow: true})`) and sets `isConsoleUrl(tab.url)`. The header row (title + icon-only Options/Documentation buttons — `browser.runtime.openOptionsPage()` and a link to `pcu.visnalize.com`) is always visible, regardless of context, since the extension's utilities span Google Play Console as a whole and not just the review section. Below the header, it branches on `isConsoleUrl`: off Play Console it shows a short generic guidance message (mentioning saved shortcuts if any exist); on Play Console it shows the bookmark-this-page control described below. A "By Visnalize" credit footer is always shown.
+
+### Saved page shortcuts (popup bookmarks)
+
+`utils/page-bookmarks.ts` defines `sync:pageBookmarks` (array of `{id, label, url}`, via `@wxt-dev/storage`) — deliberately named "page bookmarks" in code to avoid colliding with `utils/shortcuts.ts`'s unrelated keyboard-shortcut config, even though the popup UI labels this feature "Shortcuts". `createPageBookmark()` mints an id with `crypto.randomUUID()`.
+
+The popup (`entrypoints/popup/App.vue`) is the only surface for this feature — there's no options-page equivalent. While on a Play Console page, it shows a "Bookmark this page" control (pre-filled with the tab's title) that appends a `{id, label, url}` entry; if the current tab's URL is already saved, it shows a "saved as a shortcut" hint instead of the button. The saved list itself renders regardless of `isConsoleUrl`, so it's the same "quick access from anywhere" list whether the popup was opened on a Play Console page or not — entries are plain `<a target="_blank">` links (no `tabs` API call needed to navigate) plus a remove button. No separate host permission is needed since bookmarking is only offered on pages the extension already has `host_permissions` for. A "Clear all" control next to the "Shortcuts" heading wipes the whole list at once — gated behind a plain `window.confirm()` (the popup has no modal component of its own, and this is the only destructive bulk action in the UI, so a browser-native confirm is enough).
+
+### Icons
+
+UI icons (popup buttons/links, options-page remove/add/reset buttons) come from `@lucide/vue` (the non-deprecated successor to `lucide-vue-next` — don't reinstall the old package), imported as individual named components (e.g. `import { Trash2 } from '@lucide/vue'`) rather than any global icon registration.
 
 ### Options page (Vue)
 

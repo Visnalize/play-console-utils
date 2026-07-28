@@ -8,7 +8,7 @@
       class="reset"
       @click="$emit('update:modelValue', { ...defaultValue })"
     >
-      Reset
+      <RotateCcw :size="14" /> Reset
     </button>
   </span>
 </template>
@@ -16,6 +16,7 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, ref } from 'vue';
 import { formatShortcut, type QuickReplyShortcut } from '@/utils/shortcuts';
+import { RotateCcw } from '@lucide/vue';
 
 const props = defineProps<{
   modelValue: QuickReplyShortcut;

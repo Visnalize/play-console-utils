@@ -1,6 +1,6 @@
 <template>
   <section>
-    <h2>App label → slug mapping</h2>
+    <h2><Plug :size="16" /> App label → slug mapping</h2>
     <p>
       Map the app label shown in Play Console (the active app selector) to the
       slug you want used in copied review JSON. Parsing a review copies its JSON
@@ -38,13 +38,15 @@
               aria-label="Remove mapping"
               @click="removeRow(i)"
             >
-              ×
+              <Trash2 :size="16" />
             </button>
           </td>
         </tr>
       </tbody>
     </table>
-    <button type="button" @click="addRow">+ Add mapping</button>
+    <button type="button" class="add-row" @click="addRow">
+      <Plus :size="16" /> Add mapping
+    </button>
     <p role="status" aria-live="polite">{{ status }}</p>
   </section>
 </template>
@@ -58,6 +60,7 @@ import {
   watch,
   type ComponentPublicInstance,
 } from 'vue';
+import { Plug, Plus, Trash2 } from '@lucide/vue';
 import { appMappingsItem, type AppMapping } from '@/utils/app-mapping';
 
 const rows = reactive<AppMapping[]>([]);

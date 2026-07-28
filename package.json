@@ -39,6 +39,7 @@
     "wxt": "^0.20.27"
   },
   "dependencies": {
+    "@lucide/vue": "^1.27.0",
     "toastify-js": "^1.12.0"
   }
 }

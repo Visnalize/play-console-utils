@@ -15,6 +15,9 @@ h2 {
   margin-top: 2rem;
   padding-top: 1.5rem;
   border-top: 1px solid #e0e0e0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
 section:first-of-type h2 {
@@ -55,12 +58,19 @@ button {
 }
 
 td button[aria-label='Remove mapping'] {
+  display: inline-flex;
+  align-items: center;
   background: none;
   border: none;
   color: #a33;
-  font-size: 1.1rem;
   line-height: 1;
   padding: 0.25rem 0.5rem;
+}
+
+.add-row {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
 }
 
 [role='status'] {
@@ -72,6 +82,7 @@ td button[aria-label='Remove mapping'] {
 .shortcut-row {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 0.75rem;
   flex-wrap: wrap;
   margin: 0.75rem 0;
@@ -95,6 +106,12 @@ td button[aria-label='Remove mapping'] {
   gap: 0.4rem;
 }
 
+.shortcut-modifiers {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
 .shortcut-recorder button:first-child,
 .shortcut-row button.reset {
   padding: 0.35rem 0.6rem;
@@ -111,6 +128,9 @@ td button[aria-label='Remove mapping'] {
 }
 
 .shortcut-row button.reset {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
   min-width: unset;
   background: none;
   color: #555;
