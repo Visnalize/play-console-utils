@@ -1,12 +1,15 @@
 <template>
-  <section>
-    <h2><MessageSquareQuote :size="16" /> Canned reply templates</h2>
-    <p class="hint">
-      Use <code>{author}</code>, <code>{date}</code>, and <code>{app}</code> —
-      they're filled in from the review you're replying to when you pick a
-      template.
+  <section class="page-section">
+    <h2 class="section-title">
+      <MessageSquareQuote :size="24" /> Canned reply templates
+    </h2>
+    <p class="opacity-70 mt-2 text-sm">
+      Use <code class="kbd kbd-xs">{author}</code>,
+      <code class="kbd kbd-xs">{date}</code>, and
+      <code class="kbd kbd-xs">{app}</code> — they're filled in from the review
+      you're replying to when you pick a template.
     </p>
-    <table>
+    <table class="table table-sm my-3">
       <thead>
         <tr>
           <th>Label</th>
@@ -16,11 +19,12 @@
       </thead>
       <tbody>
         <tr v-for="(row, i) in rows" :key="row.id">
-          <td>
+          <td class="align-top">
             <input
               :ref="(el) => setFirstInputRef(el, i)"
               v-model="row.label"
               type="text"
+              class="w-full input input-sm"
               placeholder="e.g. Already fixed"
             />
           </td>
@@ -28,12 +32,14 @@
             <textarea
               v-model="row.content"
               rows="3"
+              class="w-full textarea textarea-sm"
               placeholder="e.g. Hi {author}, thanks for the report — this was fixed in the latest update. Please try updating {app}!"
             ></textarea>
           </td>
-          <td>
+          <td class="w-0 align-top">
             <button
               type="button"
+              class="remove-btn"
               aria-label="Remove canned reply"
               @click="removeRow(i)"
             >
@@ -45,12 +51,14 @@
     </table>
     <button
       type="button"
-      class="add-row"
+      class="font-normal btn btn-sm btn-soft"
       @click="addRow(createCannedReply('', ''))"
     >
       <Plus :size="16" /> Add canned reply
     </button>
-    <p role="status" aria-live="polite">{{ status }}</p>
+    <p class="mt-2 save-status" role="status" aria-live="polite">
+      {{ status }}
+    </p>
   </section>
 </template>
 

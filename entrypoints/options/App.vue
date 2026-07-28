@@ -1,6 +1,6 @@
 <template>
-  <main>
-    <h1>Play Console Utils — Options</h1>
+  <main class="mx-auto flex max-w-2xl flex-col gap-6 p-6">
+    <h1 class="text-xl font-semibold">Play Console Utils — Options</h1>
     <AppMappingsSection />
     <CannedRepliesSection />
     <ShortcutsSection />

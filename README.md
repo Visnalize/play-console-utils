@@ -27,6 +27,8 @@ pnpm dev:firefox  # Firefox dev build
 
 Load the unpacked extension from `.output/chrome-mv3-dev` (`chrome://extensions` → Developer mode → Load unpacked).
 
+The popup and options pages are Vue, styled with [Tailwind CSS](https://tailwindcss.com) v4 + [daisyUI](https://daisyui.com) 5 through the shared `assets/ui.css` (configured entirely in CSS — there's no `tailwind.config.js`). The content script keeps its own plain stylesheet so Tailwind's preflight can't leak into Play Console's page.
+
 ## Configuring app slugs & shortcuts
 
 Click the extension icon → **Options** in the popup (or right-click the icon → **Options**, or `chrome://extensions` → Play Console Utils → Details → Extension options).

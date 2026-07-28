@@ -1,54 +1,88 @@
 <template>
-  <section>
-    <h2><Keyboard :size="16" /> Keyboard shortcuts</h2>
+  <section class="page-section">
+    <h2 class="section-title"><Keyboard :size="24" /> Keyboard shortcuts</h2>
 
-    <div v-for="row in keyShortcutRows" :key="row.label" class="shortcut-row">
-      <span class="shortcut-label">{{ row.label }}</span>
-      <ShortcutRecorder
-        :model-value="row.current"
-        :default-value="row.fallback"
-        @update:model-value="row.onChange"
-      />
-    </div>
-
-    <div class="shortcut-row">
-      <span class="shortcut-label"
-        >Parse review (modifier + click on review text)</span
+    <div class="flex flex-col gap-3 mt-3">
+      <div
+        v-for="row in keyShortcutRows"
+        :key="row.label"
+        class="flex flex-wrap justify-between items-center gap-3"
       >
-      <span class="shortcut-modifiers">
-        <label
-          ><input v-model="parseReviewModifier.ctrlOrMeta" type="checkbox" />
-          Ctrl/⌘</label
-        >
-        <label
-          ><input v-model="parseReviewModifier.shift" type="checkbox" />
-          Shift</label
-        >
-        <label
-          ><input v-model="parseReviewModifier.alt" type="checkbox" />
-          Alt</label
-        >
-        <button type="button" class="reset" @click="resetParseReviewModifier">
-          <RotateCcw :size="14" /> Reset
-        </button>
-      </span>
-    </div>
-    <p v-if="!hasAnyModifier(parseReviewModifier)" class="warning">
-      Select at least one modifier — parsing stays off until you do.
-    </p>
+        <span class="min-w-64 text-sm">{{ row.label }}</span>
+        <ShortcutRecorder
+          :model-value="row.current"
+          :default-value="row.fallback"
+          @update:model-value="row.onChange"
+        />
+      </div>
 
-    <div class="shortcut-row">
-      <label
-        ><input v-model="autoTranslateReply" type="checkbox" /> Translate reply
-        to match the review's language before publishing</label
+      <div class="flex flex-wrap justify-between items-center gap-3">
+        <span class="min-w-64 text-sm"
+          >Parse review (modifier + click on review text)</span
+        >
+        <span class="inline-flex items-center gap-3">
+          <label class="text-sm label"
+            ><input
+              v-model="parseReviewModifier.ctrlOrMeta"
+              type="checkbox"
+              class="checkbox checkbox-sm"
+            />
+            Ctrl/⌘</label
+          >
+          <label class="text-sm label"
+            ><input
+              v-model="parseReviewModifier.shift"
+              type="checkbox"
+              class="checkbox checkbox-sm"
+            />
+            Shift</label
+          >
+          <label class="text-sm label"
+            ><input
+              v-model="parseReviewModifier.alt"
+              type="checkbox"
+              class="checkbox checkbox-sm"
+            />
+            Alt</label
+          >
+          <button
+            type="button"
+            class="opacity-70 font-normal btn btn-sm btn-ghost"
+            @click="resetParseReviewModifier"
+          >
+            <RotateCcw :size="14" /> Reset
+          </button>
+        </span>
+      </div>
+      <div
+        v-if="!hasAnyModifier(parseReviewModifier)"
+        role="alert"
+        class="py-2 text-sm alert alert-warning"
       >
-    </div>
-    <p class="hint">
-      Uses Chrome's built-in on-device translation. Requires a Chrome version
-      that supports it — falls back to publishing your reply as typed otherwise.
-    </p>
+        Select at least one modifier — parsing stays off until you do.
+      </div>
 
-    <p role="status" aria-live="polite">{{ status }}</p>
+      <div>
+        <label class="text-sm label"
+          ><input
+            v-model="autoTranslateReply"
+            type="checkbox"
+            class="checkbox checkbox-sm"
+          />
+          Translate reply to match the review's language before
+          publishing</label
+        >
+        <p class="opacity-70 mt-1 text-sm">
+          Uses Chrome's built-in on-device translation. Requires a Chrome
+          version that supports it — falls back to publishing your reply as
+          typed otherwise.
+        </p>
+      </div>
+    </div>
+
+    <p class="mt-3 save-status" role="status" aria-live="polite">
+      {{ status }}
+    </p>
   </section>
 </template>
 

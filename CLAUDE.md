@@ -145,6 +145,21 @@ The popup (`entrypoints/popup/App.vue`) is the only surface for this feature —
 
 UI icons (popup buttons/links, options-page remove/add/reset buttons) come from `@lucide/vue` (the non-deprecated successor to `lucide-vue-next` — don't reinstall the old package), imported as individual named components (e.g. `import { Trash2 } from '@lucide/vue'`) rather than any global icon registration.
 
+### Extension-page styling: Tailwind + daisyUI, shared via `assets/ui.css`
+
+The popup and options pages share one stylesheet, `assets/ui.css`: Tailwind v4 supplies the utilities, [daisyUI](https://daisyui.com) 5 the component classes (`btn`, `input`, `textarea`, `table`, `checkbox`, `label`, `alert`, `kbd`, `link`) and the token palette. It's wired up by `@tailwindcss/vite`, added to `wxt.config.ts`'s `vite.plugins` — there is no `tailwind.config.js`, since v4 is configured from CSS. Both pages' hand-written CSS (~370 lines of duplicated icon buttons, inputs, and a retyped `#a33`/`#2e7d32`/`#ccc` palette) was replaced by this.
+
+Each page's `style.css` stays the entry that `index.html` links and `main.ts` imports; it now just `@import`s the shared sheet and adds whatever is genuinely page-specific (only the popup has anything: Chrome sizes a popup from its content, so `body { width }` can't live on an element inside the Vue tree).
+
+- **The content script deliberately does not use any of this.** `entrypoints/reviews.content/style.css` stays plain hand-written CSS, because Tailwind's preflight would leak resets into Play Console's own page. Don't `@import` `assets/ui.css` from a content script.
+- **Source scanning is opt-in.** `ui.css` uses `@import 'tailwindcss' source(none)` and each importing entrypoint declares `@source './'` for its own directory. Automatic detection would scan the whole repo and emit _both_ pages' CSS into each bundle (measured: 43.8 KB per page, vs 31 KB popup / 41 KB options scoped). A new entrypoint that imports `ui.css` needs its own `@source` line or none of its classes will be emitted — the failure mode is an unstyled page, not a build error.
+- **Theme overrides go in the plain `:root` block in `ui.css`.** daisyUI emits its default theme under `:where(:root)`, which has zero specificity, so a normal `:root` block retints it without redefining the whole theme (no `@plugin "daisyui/theme"` block needed). Only four colors are overridden, and three of them are an accessibility fix rather than taste: daisyUI's light-theme `success`/`error` sit at oklch 76%/70% lightness, so 14px "Saved" or 12px "Clear all" on white lands near 2:1–3:1 contrast, below WCAG AA. The values used are the ones the old hand-written CSS had (`#2e7d32`, plus a darkened `#b3261e`), which clear 4.5:1. If you add a semantic color used as small text, check its contrast before trusting the default.
+- **The shared `@layer components` block is for what's used in three or more places** — currently `.page-section`, `.section-title`, `.save-status`, `.remove-btn`. One-off arrangements stay as inline utilities in the component. `.remove-btn` replaced an older `td button[aria-label^='Remove']` attribute-prefix selector in the options CSS; a new editable-list section applies the class explicitly rather than relying on its `aria-label` wording.
+
+**Gotcha:** class order in a `:class` binding does _not_ decide which daisyUI modifier wins — stylesheet order does. `btn-outline btn-success` rendered as a _solid_ green button because daisyUI emits the color modifier after the style modifier. If a variant doesn't look like the class list implies, check the generated CSS rather than reordering the attribute.
+
+**Gotcha:** VS Code's built-in CSS language service flags `@plugin`, `@source`, and `@apply` as unknown at-rules. `.vscode/settings.json` sets `css.lint.unknownAtRules: "ignore"` — the warnings are cosmetic, not a real error.
+
 ### Options page (Vue)
 
 `entrypoints/options/` uses `@wxt-dev/module-vue` (declared in `wxt.config.ts`'s `modules`). `App.vue` composes three independent sections:

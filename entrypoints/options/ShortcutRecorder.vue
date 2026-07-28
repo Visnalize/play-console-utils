@@ -1,11 +1,16 @@
 <template>
-  <span class="shortcut-recorder">
-    <button type="button" :class="{ recording }" @click="startRecording">
+  <span class="inline-flex items-center gap-2">
+    <button
+      type="button"
+      class="btn btn-sm min-w-32 font-normal"
+      :class="recording ? 'btn-success' : 'btn-neutral btn-soft'"
+      @click="startRecording"
+    >
       {{ recording ? 'Press a key…' : display }}
     </button>
     <button
       type="button"
-      class="reset"
+      class="btn btn-sm btn-ghost font-normal opacity-70"
       @click="$emit('update:modelValue', { ...defaultValue })"
     >
       <RotateCcw :size="14" /> Reset

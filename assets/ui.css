@@ -1,0 +1,55 @@
+/* The one stylesheet the popup and options pages share: Tailwind supplies the
+   utilities, daisyUI the component classes (btn/input/table/checkbox/alert) and
+   the token palette. Deliberately NOT imported by the content script — Tailwind's
+   preflight would leak into Play Console's own page. */
+
+/* Source scanning is opt-in: each importing entrypoint declares `@source './'`
+   for its own directory, so a page's bundle only carries the utilities and
+   components it actually uses — not the other page's. Automatic detection would
+   scan the whole repo and emit both pages' CSS into each. */
+@import 'tailwindcss' source(none);
+
+@plugin 'daisyui' {
+  themes: light --default;
+}
+
+/* daisyUI emits its default theme under `:where(:root)` — zero specificity — so a
+   plain `:root` block retints it without redefining the whole theme.
+
+   Only the three semantic colors used as *small text* are overridden. daisyUI's
+   light-theme success/error are bright enough (oklch 76%/70% lightness) that
+   14px "Saved" or a 12px "Clear all" on white lands around 2:1–3:1 contrast,
+   below WCAG AA; these darker values are the ones the hand-written CSS used and
+   clear 4.5:1. Everything else stays daisyUI's. */
+:root {
+  --color-primary: #4285f4; /* Play/Google blue, kept from the old footer link */
+  --color-primary-content: #fff;
+  --color-success: #2e7d32;
+  --color-success-content: #fff;
+  --color-error: #b3261e;
+  --color-error-content: #fff;
+}
+
+/* The vocabulary both pages share. Anything used in three or more places lives
+   here; one-off arrangements stay as inline utilities in the component. */
+@layer components {
+  /* Options-page section, separated from the previous one by a rule. */
+  .page-section {
+    @apply border-t border-base-300 pt-6 first-of-type:border-t-0 first-of-type:pt-0;
+  }
+
+  .section-title {
+    @apply flex items-center gap-2 text-lg font-semibold;
+  }
+
+  /* Autosave confirmation line. The reserved height keeps the section from
+     shifting when the message appears and clears. */
+  .save-status {
+    @apply min-h-5 text-sm text-success;
+  }
+
+  /* Row-removal button in every editable list, and in the popup's saved list. */
+  .remove-btn {
+    @apply btn btn-sm btn-square btn-ghost text-error;
+  }
+}

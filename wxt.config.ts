@@ -1,9 +1,12 @@
 import { defineConfig } from 'wxt';
+import tailwindcss from '@tailwindcss/vite';
 import { CONSOLE_URL_MATCH_PATTERN } from './utils/console-url';
 
 export default defineConfig({
   modules: ['@wxt-dev/module-vue'],
   vite: () => ({
+    // Drives assets/ui.css (popup + options only — see the note in that file).
+    plugins: [tailwindcss()],
     define: {
       // All components use <script setup> (Composition API only) and there's
       // no in-extension devtools use case, so strip both from the Vue build.

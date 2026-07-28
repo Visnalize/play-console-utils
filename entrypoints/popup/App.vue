@@ -1,11 +1,11 @@
 <template>
-  <main>
-    <header class="popup-header">
-      <h1>Play Console Utils</h1>
-      <div class="header-actions">
+  <main class="flex flex-col gap-4 p-4">
+    <header class="flex items-center justify-between gap-2">
+      <h1 class="text-base font-semibold">Play Console Utils</h1>
+      <div class="flex shrink-0 gap-1">
         <button
           type="button"
-          class="icon-btn"
+          class="btn btn-sm btn-square btn-ghost"
           aria-label="Options"
           title="Options"
           @click="openOptions"
@@ -16,7 +16,7 @@
           href="https://pcu.visnalize.com"
           target="_blank"
           rel="noopener"
-          class="icon-btn"
+          class="btn btn-sm btn-square btn-ghost"
           aria-label="Documentation"
           title="Documentation"
         >
@@ -25,7 +25,7 @@
       </div>
     </header>
 
-    <p v-if="!isOnConsole" class="guidance">
+    <p v-if="!isOnConsole" class="text-sm opacity-70">
       Open Google Play Console to use this extension<template
         v-if="bookmarks.length"
         >, or jump to a saved shortcut below</template
@@ -35,40 +35,56 @@
     <template v-else>
       <form
         v-if="addingBookmark"
-        class="bookmark-form"
+        class="flex items-center gap-1.5"
         @submit.prevent="saveBookmark"
       >
         <input
           ref="labelInputRef"
           v-model="newBookmarkLabel"
           type="text"
+          class="input input-sm min-w-0 flex-1"
           placeholder="Shortcut name"
         />
-        <button type="submit" aria-label="Save shortcut">
+        <button
+          type="submit"
+          class="btn btn-sm btn-square btn-primary"
+          aria-label="Save shortcut"
+        >
           <Check :size="15" />
         </button>
-        <button type="button" aria-label="Cancel" @click="cancelAddingBookmark">
+        <button
+          type="button"
+          class="btn btn-sm btn-square btn-ghost"
+          aria-label="Cancel"
+          @click="cancelAddingBookmark"
+        >
           <X :size="15" />
         </button>
       </form>
-      <p v-else-if="isCurrentPageBookmarked" class="hint">
+      <p
+        v-else-if="isCurrentPageBookmarked"
+        class="flex items-center gap-1.5 text-sm text-success"
+      >
         <BookmarkCheck :size="14" /> This page is saved as a shortcut.
       </p>
       <button
         v-else
         type="button"
-        class="bookmark-btn"
+        class="btn btn-sm btn-dash btn-block font-normal"
         @click="startAddingBookmark"
       >
         <BookmarkPlus :size="15" /> Bookmark this page
       </button>
     </template>
 
-    <section v-if="bookmarks.length" class="bookmarks">
-      <div class="bookmarks-header">
-        <h2>Shortcuts</h2>
+    <section v-if="bookmarks.length" class="flex flex-col gap-1.5">
+      <div class="flex items-center justify-between gap-2">
+        <h2 class="text-xs font-semibold tracking-wide uppercase opacity-60">
+          Shortcuts
+        </h2>
         <button
           type="button"
+          class="btn btn-xs btn-ghost shrink-0 text-error"
           aria-label="Clear all shortcuts"
           title="Clear all shortcuts"
           @click="clearAllBookmarks"
@@ -76,18 +92,24 @@
           <Trash2 :size="13" /> Clear all
         </button>
       </div>
-      <ul class="bookmark-list">
-        <li v-for="bookmark in bookmarks" :key="bookmark.id">
+      <ul class="flex flex-col gap-1">
+        <li
+          v-for="bookmark in bookmarks"
+          :key="bookmark.id"
+          class="flex items-center gap-1"
+        >
           <a
             :href="bookmark.url"
             target="_blank"
             rel="noopener"
             :title="bookmark.url"
+            class="btn btn-sm btn-ghost min-w-0 flex-1 justify-start border border-base-300 font-normal"
           >
-            <span>{{ bookmark.label }}</span>
+            <span class="truncate">{{ bookmark.label }}</span>
           </a>
           <button
             type="button"
+            class="remove-btn"
             aria-label="Remove shortcut"
             @click="removeBookmark(bookmark.id)"
           >
@@ -97,9 +119,13 @@
       </ul>
     </section>
 
-    <footer>
+    <footer class="text-center text-xs opacity-60">
       By
-      <a href="https://visnalize.com" target="_blank" rel="noopener"
+      <a
+        href="https://visnalize.com"
+        target="_blank"
+        rel="noopener"
+        class="link link-primary"
         >Visnalize</a
       >
     </footer>

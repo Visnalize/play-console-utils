@@ -1,0 +1,10 @@
+# Generated files — `pnpm format` reformatting these produces thousands of lines
+# of pure churn and, for the changelog, fights the release workflow that writes it.
+pnpm-lock.yaml
+docs/changelog.md
+
+# Build output
+.output
+.wxt
+docs/.vitepress/dist
+docs/.vitepress/cache
