@@ -48,22 +48,92 @@
   font-size: 13px;
 }
 
+/* Sticky (offsetting the panel's own padding) so the hint stays visible when the list scrolls. */
+.pcu-picker__header {
+  position: sticky;
+  top: -4px;
+  background: #fff;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 4px 8px 6px;
+  border-bottom: 1px solid #e8eaed;
+  margin-bottom: 4px;
+  font-size: 11px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #5f6368;
+}
+
+.pcu-picker__hint {
+  font-weight: 400;
+  text-transform: none;
+  letter-spacing: normal;
+  color: #80868b;
+}
+
 .pcu-picker__row {
-  display: block;
+  display: flex;
+  align-items: center;
+  gap: 8px;
   width: 100%;
   text-align: left;
-  padding: 6px 10px;
+  padding: 6px 8px;
   border: none;
   background: none;
   cursor: pointer;
   border-radius: 4px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
   color: inherit;
+  font: inherit;
 }
 
 .pcu-picker__row:hover,
 .pcu-picker__row:focus {
   background: #f1f3f4;
+}
+
+/* Key cap for the row's number shortcut. */
+.pcu-picker__key {
+  flex: 0 0 auto;
+  box-sizing: border-box;
+  min-width: 18px;
+  padding: 1px 4px;
+  border: 1px solid #dadce0;
+  border-bottom-width: 2px;
+  border-radius: 4px;
+  background: #f8f9fa;
+  color: #3c4043;
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 14px;
+  text-align: center;
+}
+
+/* Rows past the numbered ones keep the cap's footprint without drawing it, so labels stay aligned. */
+.pcu-picker__key--empty {
+  border-color: transparent;
+  background: none;
+}
+
+.pcu-picker__row:hover .pcu-picker__key,
+.pcu-picker__row:focus .pcu-picker__key {
+  background: #fff;
+  border-color: #bdc1c6;
+}
+
+.pcu-picker__row:hover .pcu-picker__key--empty,
+.pcu-picker__row:focus .pcu-picker__key--empty {
+  border-color: transparent;
+  background: none;
+}
+
+.pcu-picker__label {
+  flex: 1 1 auto;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }

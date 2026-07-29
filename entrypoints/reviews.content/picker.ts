@@ -17,7 +17,12 @@ import { watchValue } from '@/utils/watch';
 import { showToast } from './toast';
 
 const PANEL_CLASS = 'pcu-picker';
+const HEADER_CLASS = 'pcu-picker__header';
+const HINT_CLASS = 'pcu-picker__hint';
 const ROW_CLASS = 'pcu-picker__row';
+const KEY_CLASS = 'pcu-picker__key';
+const KEY_EMPTY_CLASS = 'pcu-picker__key--empty';
+const LABEL_CLASS = 'pcu-picker__label';
 
 // Only the first nine rows get a number key — later templates stay listed and
 // clickable, just unnumbered.
@@ -94,12 +99,38 @@ function openPicker(replyEl: HTMLElement, templates: CannedReply[]) {
     if (!panel.contains(e.target as Node)) close();
   }
 
+  const header = document.createElement('div');
+  header.className = HEADER_CLASS;
+  header.textContent = 'Canned replies';
+  const hint = document.createElement('span');
+  hint.className = HINT_CLASS;
+  hint.textContent = 'press a number key';
+  header.appendChild(hint);
+  panel.appendChild(header);
+
   templates.forEach((template, i) => {
     const row = document.createElement('button');
     row.type = 'button';
     row.className = ROW_CLASS;
-    row.textContent =
-      i < NUMBERED_ROWS ? `${i + 1}. ${template.label}` : template.label;
+
+    // The digit renders as a key cap rather than a "1." text prefix so it reads
+    // as a shortcut. Rows past NUMBERED_ROWS keep an empty cap of the same width
+    // so every label stays on the same left edge.
+    const key = document.createElement('span');
+    const numbered = i < NUMBERED_ROWS;
+    key.className = numbered ? KEY_CLASS : `${KEY_CLASS} ${KEY_EMPTY_CLASS}`;
+    key.textContent = numbered ? String(i + 1) : '';
+    if (numbered) {
+      row.setAttribute('aria-keyshortcuts', String(i + 1));
+    } else {
+      key.setAttribute('aria-hidden', 'true');
+    }
+
+    const label = document.createElement('span');
+    label.className = LABEL_CLASS;
+    label.textContent = template.label;
+
+    row.append(key, label);
     row.addEventListener('click', () => select(template));
     panel.appendChild(row);
   });
