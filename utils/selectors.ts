@@ -7,6 +7,7 @@
 export const REVIEW_CONTAINER = '.review-container';
 export const REVIEW_AUTHOR = '.author-display-name';
 export const REVIEW_DATE = '.last-update-time';
+export const REVIEW_TEXT = '.review-text';
 export const REVIEW_AVATAR = '.review-avatar';
 export const ACTIVE_APP_BUTTON = '.active-app-button';
 

@@ -11,6 +11,7 @@ import {
   getReviewAvatarUrl,
   getReviewContainerOf,
   getReviewDate,
+  getReviewText,
 } from '@/utils/dom';
 import { watchValue } from '@/utils/watch';
 import { showToast } from './toast';
@@ -43,7 +44,7 @@ export async function initParseReview(ctx: ContentScriptContext) {
         author,
         date: getReviewDate(container),
         app: appName,
-        content: target.innerText.trim(),
+        content: getReviewText(container),
       };
 
       if (avatarUrl) {

@@ -24,8 +24,15 @@ import { ORIGINAL_LANGUAGE_HEADER, PUBLISH_LABELS } from '@/utils/selectors';
 import { watchValue } from '@/utils/watch';
 import { showToast } from './toast';
 
-function findPublishButton(): HTMLElement | undefined {
-  return findButtonByText(document, PUBLISH_LABELS);
+// Scoped to the review being replied to where possible: PUBLISH_LABELS is
+// matched as a substring against text *or* aria-label, so a document-wide
+// search can land on another review's (disabled) publish button before the
+// one that belongs to this reply.
+function findPublishButton(scope?: Element | null): HTMLElement | undefined {
+  return (
+    (scope && findButtonByText(scope, PUBLISH_LABELS)) ??
+    findButtonByText(document, PUBLISH_LABELS)
+  );
 }
 
 // Setting the reply's content programmatically still routes through Play
@@ -33,14 +40,15 @@ function findPublishButton(): HTMLElement | undefined {
 // state reflects it — that isn't synchronous with the dispatched input
 // event, so poll briefly instead of checking once right after the mutation.
 async function waitForEnabledPublishButton(
-  timeoutMs = 1000,
+  scope: Element | null,
+  timeoutMs = 3000,
   intervalMs = 50,
 ): Promise<HTMLElement | undefined> {
   const deadline = Date.now() + timeoutMs;
-  let btn = findPublishButton();
+  let btn = findPublishButton(scope);
   while ((!btn || isButtonDisabled(btn)) && Date.now() < deadline) {
     await new Promise((resolve) => setTimeout(resolve, intervalMs));
-    btn = findPublishButton();
+    btn = findPublishButton(scope);
   }
   return btn;
 }
@@ -94,13 +102,25 @@ export async function initQuickReply(ctx: ContentScriptContext) {
 
     e.preventDefault();
 
-    const translated = autoTranslate()
-      ? await translateReplyToReviewLanguage(active)
-      : false;
+    const container = getReviewContainerOf(active);
+
+    // A throw from the on-device translation APIs (an unavailable model, a
+    // download the page isn't allowed to start) would otherwise reject this
+    // async listener and skip publishing entirely, with nothing but an
+    // unhandled rejection to show for it.
+    let translated = false;
+    if (autoTranslate()) {
+      try {
+        translated = await translateReplyToReviewLanguage(active);
+      } catch (error) {
+        console.warn('Play Console Utils: translation failed.', error);
+        showToast('⚠️ Translation failed — publishing original text');
+      }
+    }
 
     const publishBtn = translated
-      ? await waitForEnabledPublishButton()
-      : findPublishButton();
+      ? await waitForEnabledPublishButton(container)
+      : findPublishButton(container);
 
     if (!publishBtn || isButtonDisabled(publishBtn)) {
       if (translated) {

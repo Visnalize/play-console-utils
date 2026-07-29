@@ -30,11 +30,19 @@ import { showToast } from './toast';
 // skipped as soon as you've scrolled past its top edge by a few pixels.
 const CURRENT_THRESHOLD_PX = 80;
 
+// A review that's already been replied to has no reply field to focus, so
+// after landing on one there's nothing focused to derive "where you are"
+// from. Remembering the last review we navigated to keeps forward navigation
+// moving past it instead of resolving the current review from stale focus (or
+// from a viewport position the smooth scroll hasn't reached yet) and
+// targeting the same replied review over and over.
+let lastNavigatedContainer: HTMLElement | null = null;
+
 function getFocusedReviewContainer(): HTMLElement | null {
   return getReviewContainerOf(getFocusedReplyField());
 }
 
-function getCurrentIndexByViewport(containers: Element[]): number {
+function getCurrentIndexByViewport(containers: HTMLElement[]): number {
   let currentIndex = 0;
   for (let i = 0; i < containers.length; i++) {
     if (containers[i].getBoundingClientRect().top <= CURRENT_THRESHOLD_PX) {
@@ -48,11 +56,17 @@ function getCurrentIndexByViewport(containers: Element[]): number {
 
 // Prefer the review whose reply field you're actively focused in — it's a
 // more precise "where you are" than the viewport-position guess, e.g. if
-// you've scrolled slightly while typing a reply.
-function getCurrentIndex(containers: Element[]): number {
+// you've scrolled slightly while typing a reply. The review we last navigated
+// to comes next, and only then the viewport; both earlier answers are dropped
+// if the list has re-rendered out from under them.
+function getCurrentIndex(containers: HTMLElement[]): number {
   const focusedContainer = getFocusedReviewContainer();
   if (focusedContainer) {
     const index = containers.indexOf(focusedContainer);
+    if (index !== -1) return index;
+  }
+  if (lastNavigatedContainer) {
+    const index = containers.indexOf(lastNavigatedContainer);
     if (index !== -1) return index;
   }
   return getCurrentIndexByViewport(containers);
@@ -90,11 +104,17 @@ function navigateReview(isNext: boolean) {
   discardUnpublishedDraft(containers[currentIndex]);
 
   const target = containers[targetIndex];
+  lastNavigatedContainer = target;
   target.scrollIntoView({ behavior: 'smooth', block: 'start' });
   flashHighlight(target);
   // preventScroll so the browser's default focus-scroll doesn't fight the
   // smooth scrollIntoView above.
-  findReplyFieldIn(target)?.focus({ preventScroll: true });
+  const replyField = findReplyFieldIn(target);
+  replyField?.focus({ preventScroll: true });
+  // Nothing to focus on an already-replied review — drop the focus we're
+  // leaving behind rather than let the previous review keep claiming to be
+  // the current one.
+  if (document.activeElement !== replyField) getFocusedReplyField()?.blur();
 }
 
 // Clicks Play Console's own paginator instead of moving within the list. No
@@ -117,6 +137,7 @@ function navigatePage(isNext: boolean) {
   const focusedContainer = getFocusedReviewContainer();
   if (focusedContainer) discardUnpublishedDraft(focusedContainer);
 
+  lastNavigatedContainer = null;
   button.click();
 }
 

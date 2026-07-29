@@ -9,6 +9,7 @@ import {
   REVIEW_AVATAR,
   REVIEW_CONTAINER,
   REVIEW_DATE,
+  REVIEW_TEXT,
 } from './selectors';
 
 export const UNKNOWN_AUTHOR = 'Unknown Author';
@@ -66,6 +67,14 @@ export function getActiveAppLabel(): string {
   );
 }
 
+// The review body only — the element that receives a click on it is a wrapper
+// that also carries the device line, the "Translated from …" banner and the
+// reply box's helper text, so the clicked element's own innerText is all of
+// that at once.
+export function getReviewText(container: Element | null | undefined): string {
+  return innerTextOf(container, REVIEW_TEXT);
+}
+
 /* ----------------------------- reply fields ------------------------------ */
 
 export function isReplyField(el: Element): boolean {
@@ -92,7 +101,36 @@ export function getReplyText(el: HTMLElement): string {
     : el.innerText;
 }
 
+function selectAllIn(el: HTMLElement) {
+  if (el.tagName === 'TEXTAREA') {
+    (el as HTMLTextAreaElement).select();
+    return;
+  }
+  const range = document.createRange();
+  range.selectNodeContents(el);
+  const selection = window.getSelection();
+  selection?.removeAllRanges();
+  selection?.addRange(range);
+}
+
+// Replaces the field's content the way a user would: select everything, then
+// type over it. execCommand is deprecated but it's still the only API that
+// runs the browser's real editing pipeline, which matters twice over here —
+// it emits trusted beforeinput/input events Play Console's Angular bindings
+// can't miss, and it keeps the caret (and therefore focus) inside the field.
+// Assigning `.innerText` instead tears out the node the caret lives in, which
+// drops focus out of a contenteditable reply box and takes Play Console's
+// reply toolbar — Publish button included — down with it.
 export function setReplyText(el: HTMLElement, text: string) {
+  el.focus({ preventScroll: true });
+  try {
+    selectAllIn(el);
+    document.execCommand('insertText', false, text);
+    if (getReplyText(el).trim() === text.trim()) return;
+  } catch {
+    // Fall through to the direct write below.
+  }
+
   if (el.tagName === 'TEXTAREA') {
     (el as HTMLTextAreaElement).value = text;
   } else {
@@ -102,6 +140,9 @@ export function setReplyText(el: HTMLElement, text: string) {
   // these are dispatched — and even then not synchronously.
   el.dispatchEvent(new Event('input', { bubbles: true }));
   el.dispatchEvent(new Event('change', { bubbles: true }));
+  // The write above may have blown away the caret; put focus back so the
+  // reply toolbar stays open.
+  el.focus({ preventScroll: true });
 }
 
 /* -------------------------------- buttons -------------------------------- */

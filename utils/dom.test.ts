@@ -7,9 +7,15 @@ import {
   getReplyText,
   getReviewAuthor,
   getReviewDate,
+  getReviewText,
   isButtonDisabled,
 } from './dom';
-import { ACTIVE_APP_BUTTON, REVIEW_AUTHOR, REVIEW_DATE } from './selectors';
+import {
+  ACTIVE_APP_BUTTON,
+  REVIEW_AUTHOR,
+  REVIEW_DATE,
+  REVIEW_TEXT,
+} from './selectors';
 
 // jsdom isn't a dependency of this project (see CLAUDE.md's testing notes) —
 // fake just enough of the Element shape these functions actually touch,
@@ -144,6 +150,20 @@ describe('isButtonDisabled', () => {
         fakeButton({ textContent: 'Publish', ariaDisabled: 'false' }),
       ),
     ).toBe(false);
+  });
+});
+
+describe('getReviewText', () => {
+  it('reads the review body, not the whole container', () => {
+    const container = fakeContainer({
+      [REVIEW_TEXT]: { innerText: ' Great app! ' },
+    });
+    expect(getReviewText(container)).toBe('Great app!');
+  });
+
+  it('returns an empty string when the selector is missing', () => {
+    expect(getReviewText(fakeContainer({}))).toBe('');
+    expect(getReviewText(null)).toBe('');
   });
 });
 
