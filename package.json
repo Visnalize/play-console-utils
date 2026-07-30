@@ -1,6 +1,6 @@
 {
   "name": "play-console-utils",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "Productivity utilities and shortcuts for Google Play Console.",
   "type": "module",
   "private": true,
