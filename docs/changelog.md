@@ -8,6 +8,15 @@ All notable changes to Play Console Utils are documented in this file.
 
 <!-- changelog-insert -->
 
+## [1.2.1] - 2026-07-30
+
+- chore: update README (6e17ecd)
+- feat: enhance canned replies UI (08ee3a2)
+- fix: navigation, review text content parsing, quick reply issues (50ce01f)
+
+**Full Changelog**: https://github.com/Visnalize/play-console-utils/compare/v1.2.0...v1.2.1
+
+
 ## [1.2.0] - 2026-07-28
 
 - feat: enhance popup and options page UI (1dacf6e)
