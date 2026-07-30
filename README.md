@@ -1,19 +1,28 @@
 # Play Console Utils
 
-A Chrome extension (Manifest V3, built with [WXT](https://wxt.dev)) that adds small productivity shortcuts to the [Google Play Console](https://play.google.com/console/) review section.
+A Chrome extension (Manifest V3, built with [WXT](https://wxt.dev)) that adds small productivity utilities and shortcuts to the [Google Play Console](https://play.google.com/console/).
 
 ## Features
 
-- **Quick reply (Ctrl/Cmd + Enter by default)** — While focused in a reply textarea/editable field, press the configured shortcut to automatically find and click the "Publish reply" button (supports English and Spanish button labels), with a brief visual confirmation flash. If the review is in a different language, the reply is first translated to match it using Chrome's built-in on-device translation (toggle in Options; falls back to publishing as typed if unsupported or unavailable).
-- **Parse review (Alt + Click by default)** — Click a review's text while holding the configured modifier(s) to copy a structured JSON snippet to the clipboard containing the author name, date, app slug, review content, and avatar image URL. Shows a toast notification confirming the copy.
-- **Canned reply templates (Ctrl/Cmd + K by default)** — While focused in a reply field, press the configured shortcut to open a floating picker of your saved reply templates (click a row, or press its number). Templates can include `{author}`, `{date}`, and `{app}` placeholders, filled in from the review you're replying to. Manage the template list from the Options page.
-- **Review navigation (Alt + ↓ / Alt + ↑, Alt + → / Alt + ← by default)** — Jump to the next/previous review in the list without touching the mouse. The review you land on is scrolled to, highlighted, and its reply box focused so you can start typing (or use Quick reply/Canned reply) immediately. Alt + → / Alt + ← page through the review list itself (clicking Play Console's own pagination controls). Either way, if you're leaving behind an unpublished draft, it's discarded automatically instead of being left stranded.
-- **Configurable app slugs (Options page)** — Map each Play Console app label to your own slug, used in the JSON copied by the Parse review feature. Apps without a configured mapping fall back to an auto-generated slug.
-- **Configurable shortcuts (Options page)** — Change any of the key-combo shortcuts (click "Record" and press your combo) and the parse-review click modifier(s), independent of the app slug mapping and canned reply templates. Changes apply immediately, no reload needed.
-- **Settings sync across devices** — Shortcuts, the auto-translate toggle, app slug mappings, and canned reply templates are all stored via Chrome sync, so they follow you to any other Chrome profile you're signed into.
-- **Active-state toolbar icon** — The toolbar icon is grayscale by default and switches to the full-color icon on tabs where the Play Console features are active (`https://play.google.com/console/*`).
-- **Popup** — Click the toolbar icon for icon-button quick links to the Options page and the [documentation site](https://pcu.visnalize.com), always visible regardless of the current tab; on non-Play-Console tabs it shows a short reminder to open Play Console to use the extension's shortcuts.
-- **Saved shortcuts (bookmarks)** — While on a Play Console page, bookmark it from the popup under a name of your choice for one-click access later. Saved shortcuts show up in the popup on every page, Play Console or not, and sync across devices alongside your other settings.
+- ⚡ **Quick reply (Ctrl/Cmd + Enter by default)** — While focused in a reply textarea/editable field, press the configured shortcut to automatically find and click the "Publish reply" button (supports English and Spanish button labels), with a brief visual confirmation flash. If the review is in a different language, the reply is first translated to match it using Chrome's built-in on-device translation (toggle in Options; falls back to publishing as typed if unsupported or unavailable).
+- 📝 **Canned reply templates (Ctrl/Cmd + K by default)** — While focused in a reply field, press the configured shortcut to open a floating picker of your saved reply templates (click a row, or press its number). Templates can include `{author}`, `{date}`, and `{app}` placeholders, filled in from the review you're replying to. Manage the template list from the Options page.
+- ↕️ **Review navigation (Alt + ↓ / Alt + ↑, Alt + → / Alt + ← by default)** — Jump to the next/previous review in the list without touching the mouse. The review you land on is scrolled to, highlighted, and its reply box focused so you can start typing (or use Quick reply/Canned reply) immediately. Alt + → / Alt + ← page through the review list itself (clicking Play Console's own pagination controls). Either way, if you're leaving behind an unpublished draft, it's discarded automatically instead of being left stranded.
+- 🔍 **Parse review (Alt + Click by default)** — Click a review's text while holding the configured modifier(s) to copy a structured JSON snippet to the clipboard containing the author name, date, app slug, review content, and avatar image URL. Shows a toast notification confirming the copy.
+- ☁️ **Settings sync across devices** — Shortcuts, the auto-translate toggle, app slug mappings, and canned reply templates are all stored via Chrome sync, so they follow you to any other Chrome profile you're signed into.
+- 📑 **Saved shortcuts (bookmarks)** — While on a Play Console page, bookmark it from the popup under a name of your choice for one-click access later. Saved shortcuts show up in the popup on every page, Play Console or not, and sync across devices alongside your other settings.
+- 🛠️ **Fully customizable** — All features, including app slugs, keyboard shortcuts, and canned replies, can be configured to suit your workflow.
+
+## Installation
+
+[![Available in the Chrome web store](https://developer.chrome.com/static/docs/webstore/branding/image/iNEddTyWiMfLSwFD6qGq.png)](https://chromewebstore.google.com/detail/play-console-utils/nmhdlfiiadbnjnclabgonbapkmhkahkn)
+
+Or install the extension manually following these steps:
+
+1. Download the latest release from [GitHub](https://github.com/visnalize/play-console-utils/releases).
+2. Unzip the downloaded file.
+3. Open Chrome and go to `chrome://extensions`.
+4. Enable "Developer mode" (top right).
+5. Click "Load unpacked" and select the unzipped folder.
 
 ## Development
 
@@ -28,14 +37,6 @@ pnpm dev:firefox  # Firefox dev build
 Load the unpacked extension from `.output/chrome-mv3-dev` (`chrome://extensions` → Developer mode → Load unpacked).
 
 The popup and options pages are Vue, styled with [Tailwind CSS](https://tailwindcss.com) v4 + [daisyUI](https://daisyui.com) 5 through the shared `assets/ui.css` (configured entirely in CSS — there's no `tailwind.config.js`). The content script keeps its own plain stylesheet so Tailwind's preflight can't leak into Play Console's page.
-
-## Configuring app slugs & shortcuts
-
-Click the extension icon → **Options** in the popup (or right-click the icon → **Options**, or `chrome://extensions` → Play Console Utils → Details → Extension options).
-
-- **App slugs**: add a row per app — the label as shown in Play Console's active-app selector, and the slug you want in the copied JSON.
-- **Canned replies**: add a row per template — a label and the reply text (with optional `{author}`/`{date}`/`{app}` placeholders).
-- **Shortcuts**: click a combo button and press your desired key combo (Esc cancels) for quick-reply, insert-canned-reply, next/previous-review, or next/previous-review-page; check/uncheck modifiers for the parse-review click trigger (at least one must stay selected); toggle auto-translate for quick replies. All save automatically.
 
 ## Building & packaging
 
