@@ -1,5 +1,6 @@
 ---
 title: Privacy Policy
+description: How Play Console Utils handles your data - no analytics, no network requests, no review content or clipboard data ever leaving your device. Settings are stored only in Chrome's own sync storage.
 ---
 
 # Privacy Policy for Play Console Utils

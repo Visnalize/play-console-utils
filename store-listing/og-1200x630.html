@@ -1,0 +1,134 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        width: 1200px;
+        height: 630px;
+      }
+      body {
+        position: relative;
+        overflow: hidden;
+        font-family:
+          -apple-system, 'SF Pro Display', 'Inter', system-ui, sans-serif;
+        color: #fff;
+        background:
+          radial-gradient(
+            110% 90% at 12% -10%,
+            rgba(120, 165, 255, 0.55) 0%,
+            rgba(120, 165, 255, 0) 55%
+          ),
+          linear-gradient(135deg, #2f62d9 0%, #1f4dbe 45%, #163a99 100%);
+      }
+      .dots {
+        position: absolute;
+        inset: 0;
+        background-image: radial-gradient(
+          rgba(255, 255, 255, 0.14) 1.5px,
+          transparent 1.5px
+        );
+        background-size: 26px 26px;
+        opacity: 0.5;
+      }
+      .wrap {
+        position: relative;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        padding: 0 84px;
+      }
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        margin-bottom: 34px;
+      }
+      .badge {
+        width: 68px;
+        height: 68px;
+        border-radius: 50%;
+        background: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 8px 24px rgba(9, 32, 84, 0.28);
+      }
+      .badge svg {
+        width: 38px;
+        height: 38px;
+      }
+      .brand span {
+        font-size: 40px;
+        font-weight: 700;
+        letter-spacing: -0.01em;
+      }
+      h1 {
+        font-size: 72px;
+        line-height: 1.06;
+        font-weight: 800;
+        letter-spacing: -0.025em;
+        max-width: 940px;
+      }
+      p {
+        margin-top: 26px;
+        font-size: 29px;
+        line-height: 1.45;
+        max-width: 880px;
+        color: rgba(255, 255, 255, 0.86);
+      }
+      .chips {
+        display: flex;
+        gap: 14px;
+        margin-top: 46px;
+        flex-wrap: wrap;
+      }
+      .chip {
+        font-size: 23px;
+        font-weight: 600;
+        padding: 13px 24px;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.14);
+        border: 1px solid rgba(255, 255, 255, 0.22);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="dots"></div>
+    <div class="wrap">
+      <div class="brand">
+        <div class="badge">
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="#1f4dbe"
+            stroke-width="3.4"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="M4 12.5 L9.5 18 L20 6.5" />
+          </svg>
+        </div>
+        <span>Play Console Utils</span>
+      </div>
+      <h1>Handle Play Store reviews from the keyboard</h1>
+      <p>
+        Publish replies with one shortcut, auto-translate them on-device, insert
+        canned templates, and copy any review as JSON.
+      </p>
+      <div class="chips">
+        <div class="chip">Quick reply</div>
+        <div class="chip">Auto-translate</div>
+        <div class="chip">Canned replies</div>
+        <div class="chip">Copy as JSON</div>
+      </div>
+    </div>
+  </body>
+</html>

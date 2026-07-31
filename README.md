@@ -56,7 +56,16 @@ pnpm test         # vitest
 
 ## Docs & privacy policy site
 
-The `docs/` folder is a [VitePress](https://vitepress.dev) site (currently just the privacy policy, at `docs/privacy/index.md`) published to `https://pcu.visnalize.com`.
+The `docs/` folder is a [VitePress](https://vitepress.dev) site — home page, privacy policy, and changelog — published to `https://pcu.visnalize.com`.
+
+All SEO metadata is generated in [`docs/.vitepress/config.ts`](docs/.vitepress/config.ts): static tags (favicon, `theme-color`, keywords, Open Graph image, Twitter card) in `head`, and per-page `canonical`/`og:url`/`og:title`/`og:description` plus the home page's `SoftwareApplication` JSON-LD in `transformPageData`. `sitemap.xml` is emitted by VitePress from the `sitemap.hostname` option, and `docs/public/robots.txt` points at it. Page titles and descriptions come from each page's frontmatter `title`/`description` — add both when adding a page. The social preview image (`docs/public/og.png`, 1200×630) is rendered from [`store-listing/og-1200x630.html`](store-listing/og-1200x630.html) with headless Chrome:
+
+```sh
+# run from the repo root — Chrome needs an absolute file:// URL, not a relative path
+"/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" --headless --hide-scrollbars \
+  --window-size=1200,630 --force-device-scale-factor=1 \
+  --screenshot=docs/public/og.png "file://$PWD/store-listing/og-1200x630.html"
+```
 
 ```sh
 pnpm docs:dev      # local dev server with hot reload

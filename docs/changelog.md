@@ -1,5 +1,6 @@
 ---
 title: Changelog
+description: Release notes for Play Console Utils - every version, what changed in it, and when it shipped.
 ---
 
 # Changelog
