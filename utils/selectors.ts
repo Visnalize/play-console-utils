@@ -1,8 +1,7 @@
 // Every selector and button label the extension uses to reach into Play
-// Console's DOM lives here — that DOM is a third-party contract that can
-// change without notice, so keeping it in one file makes "what broke when
-// Play Console re-skinned the reviews page" a single-file question.
-// Behaviour that reads through these selectors belongs in utils/dom.ts.
+// Console's DOM. That DOM is a third-party contract that can change without
+// notice, so keeping it here makes "what broke in the re-skin" a single-file
+// question. Behaviour that reads through these selectors lives in utils/dom.ts.
 
 export const REVIEW_CONTAINER = '.review-container';
 export const REVIEW_AUTHOR = '.author-display-name';
@@ -38,8 +37,8 @@ export const BUTTON = 'button, material-button';
 //
 // There is no `<input>` in the row — the price is rendered text, and editing
 // it means clicking the price cell to open a popup editor. (The `.ess-edit-icon`
-// is only the visible affordance; the cell itself takes the click.) An earlier
-// version of this file assumed an input per row and so matched nothing at all.
+// is only the visible affordance; the cell itself takes the click.) Assuming an
+// input per row, as an earlier version did, matches nothing at all.
 export const PRICE_ROW = '[role="row"]';
 
 // A header row uses the same essfield columns as a data row, so it's excluded
@@ -47,11 +46,10 @@ export const PRICE_ROW = '[role="row"]';
 export const COLUMN_HEADER = '[role="columnheader"]';
 
 // "Other countries / regions (USD)" and "(EUR)" are collapsible *group*
-// headers, and they use the exact same row markup as a real market: same
-// `particle-table-row`, same region/price/tax cells. What sets them apart is
-// this expand/collapse control, plus an empty price cell with no edit
-// affordance. Matching on Play Console's own debug-id beats matching the
-// label, which is localised.
+// headers wearing the exact same row markup as a real market, but with an
+// empty price cell and no edit affordance. This expand/collapse control is
+// what sets them apart — and matching Play Console's own debug-id beats
+// matching their label, which is localised.
 export const PRICE_GROUP_TOGGLE = '[debug-id="zippy-button"]';
 
 // The market name and the price live in separate cells. Reading the market

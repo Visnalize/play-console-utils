@@ -36,13 +36,10 @@ const EDITOR_COMMIT_TIMEOUT_MS = 1000;
 const CONSECUTIVE_FAILURE_LIMIT = 3;
 
 /**
- * One row's worth of decision, carrying **no element reference**.
- *
- * The row is re-found by market name at the moment it's filled. Holding the
- * element instead is how an earlier version wrote one market's price into
- * another's editor: Play Console re-renders a row after its price changes, so
- * a reference captured when the plan was built can be a node the console has
- * since reused for something else.
+ * One row's worth of decision, carrying **no element reference** — the row is
+ * re-found by market name at fill time. Play Console re-renders a row after
+ * its price changes, so a plan-time reference can be a node it has since
+ * reused, which is how one market's price ended up in another's editor.
  */
 interface PlannedRow {
   /** The row's own region label — also how the row is found again. */
@@ -86,9 +83,9 @@ function planPrices(
     const target = targetFor(priceRow);
     if (!target) continue;
 
-    // The currency the row is actually billed in, which is not always the
-    // market's own: Play Console bills Cambodia and Angola in USD, and much
-    // of non-euro Europe in EUR. Read it from the cell, never assume.
+    // The currency the row is *billed* in, which isn't always the market's own
+    // (Cambodia and Angola in USD, much of non-euro Europe in EUR). Read it
+    // off the cell, never assume.
     const quoted = quotePrice(
       basePrice,
       base,
@@ -131,10 +128,9 @@ export function scanPrices(
 
 function previewRow(item: PlannedRow, base: PppCountry | undefined) {
   const { target, quoted } = item;
-  // What the console shows today, so the panel can put the two side by side.
-  // null (no digits in the cell) means unpriced, which is not the same as 0.
-  // It's in the row's billing currency, same as the proposal — so the two are
-  // directly comparable and the percentage is meaningful.
+  // What the console shows today, in the row's billing currency — so it's
+  // directly comparable to the proposal. null (no digits in the cell) means
+  // unpriced, which is not the same as 0.
   const current = parsePriceValue(item.valueText);
   const inBase = (value: number) =>
     base
@@ -145,11 +141,10 @@ function previewRow(item: PlannedRow, base: PppCountry | undefined) {
       : '';
 
   return {
-    // The row's own region label, not the matched target's name. A market
-    // with no World Bank observation (Vatican City) resolves only by
-    // currency, and target.name would then be the bare code — the panel
-    // showed "EUR" where the console says "Vatican City". It also keeps the
-    // list keys unique when several unmatched rows share a currency.
+    // The row's own label, not the matched target's name: a market with no
+    // World Bank observation (Vatican City) resolves only by currency, so
+    // target.name would be the bare code. Also keeps list keys unique when
+    // several unmatched rows share a currency.
     market: item.market || target.name,
     currency: quoted.currency,
     price: formatPrice(quoted.amount, quoted.decimals),
@@ -173,13 +168,11 @@ function currencyCodeIn(text: string): string | null {
 }
 
 /**
- * Dismisses a popup left open from a previous row.
- *
- * Play Console reuses one editor pane, so a popup that hasn't finished
- * closing is the popup `findOpenPriceEditor()` returns for the *next* row —
- * which then gets that row's price typed into the previous row's editor. The
- * currency check in `fillRow()` catches the consequence, but only by skipping
- * the market, so clearing it up front is what keeps the skip from happening.
+ * Dismisses a popup left open from a previous row. Play Console reuses one
+ * editor pane, so a popup still closing is the one `findOpenPriceEditor()`
+ * hands back for the *next* row — which then gets its price typed into the
+ * previous row's editor. `fillRow()`'s currency check catches that, but only
+ * by skipping the market; clearing it up front avoids the skip.
  */
 async function closeStrayEditor() {
   const stray = findOpenPriceEditor();
@@ -219,11 +212,9 @@ async function fillRow(item: PlannedRow): Promise<FillOutcome> {
   if (!editor) return 'failed';
 
   // The editor is portalled to the end of <body>, so nothing structural ties
-  // it to the row that opened it — if the click landed on a neighbour, this
-  // is the last chance to notice before pricing the wrong market. Its
-  // aria-label carries the currency; so does the row's own cell.
-  // Compare against the currency the plan priced in, which is the row's
-  // own billing currency — not the market's.
+  // it to the row that opened it. Its aria-label carries a currency and so
+  // does the row's cell — comparing them is the last chance to notice a click
+  // that landed on a neighbour, before the wrong market gets priced.
   const rowCurrency = item.quoted.currency;
   const editorCurrency = currencyCodeIn(
     editor.input.getAttribute('aria-label') ?? '',
@@ -285,9 +276,8 @@ async function fillEach(
     if (outcome === 'filled') {
       state.filled++;
       state.consecutiveFailures = 0;
-      // Reported *after* the write, never before: a count that leads the work
-      // is the bug that made the old "N filled" label wrong in both
-      // directions. The bar can only ever lag reality, not overstate it.
+      // Reported *after* the write, never before, so the bar can lag reality
+      // but never overstate it.
       onProgress(state.filled, state.total);
       continue;
     }
@@ -309,16 +299,14 @@ async function fillEach(
 /**
  * Walks the table once, then retries whatever didn't take.
  *
- * Every price row is in the DOM from the start — the table doesn't
- * virtualise, and a row's edit control works without scrolling it into view —
- * so one ordered pass reaches every market and there is nothing to
- * re-discover. (An earlier version scrolled the table and swept it repeatedly
- * on the assumption that it did virtualise. That machinery is gone; it caused
- * far more trouble than it solved, jumping the page around mid-fill.)
+ * Every price row is in the DOM from the start — the table doesn't virtualise,
+ * and a row's edit control works without scrolling it into view — so one
+ * ordered pass reaches every market with nothing to re-discover. Don't
+ * reintroduce scrolling or repeated sweeps; that machinery existed, on the
+ * opposite assumption, and only jumped the page around mid-fill.
  *
- * The single retry is for transient trouble only: a row Angular happened to
- * be re-rendering, or an editor that was slow to close. It costs one extra
- * attempt per market that didn't take, and nothing at all when they all did.
+ * The single retry covers transient trouble: a row Angular happened to be
+ * re-rendering, or an editor slow to close.
  */
 export async function runFill(
   basePrice: number,

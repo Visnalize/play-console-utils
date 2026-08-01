@@ -8,8 +8,10 @@ import { PPP_COUNTRIES, type PppCountry } from './ppp-data';
 //   internationalDollars = basePrice / basePpp
 //   targetPrice          = internationalDollars * targetPpp
 //
-// That's the whole model, and it deliberately needs no exchange rates — a PPP
-// conversion factor is already "local currency units per international $".
+// That's the whole model, and it needs no exchange rate — a PPP conversion
+// factor is already "local currency units per international $". The one
+// exception is a row billed in a currency that isn't the market's own; see
+// quotePrice().
 //
 // `customFactor` scales the result. Pure PPP charges the same real purchasing
 // power everywhere, which is often lower than a publisher wants; the factor is
@@ -17,9 +19,9 @@ import { PPP_COUNTRIES, type PppCountry } from './ppp-data';
 // the base country included, so the model stays one multiplication with no
 // special cases — set it to 1 for untouched PPP.
 //
-// There is still deliberately no "floor the discount at X% of base" knob:
-// expressing that bound needs market FX rates the bundled dataset doesn't
-// carry, so the setting would be pretending to know something it doesn't.
+// There is deliberately no "floor the discount at X% of base" knob: that bound
+// would need an FX rate on *every* market rather than only the cross-currency
+// ones, spreading exchange-rate drift across prices that currently have none.
 
 export type RoundingMode = 'charm99' | 'charm90' | 'nice' | 'exact';
 
@@ -190,9 +192,9 @@ export interface QuotedPrice {
  * **Play Console does not price every market in its own currency.** Cambodia,
  * Angola and Argentina are billed in USD; much of non-euro Europe in EUR. A
  * PPP factor cannot cross that gap on its own — it says a basket costs
- * `ppp × X` riel, and says nothing about what a riel is worth in dollars. So
- * writing the riel figure into a USD field overcharges by roughly the
- * exchange rate, which for KHR is about four thousand times.
+ * `ppp × X` riel and nothing about what a riel is worth in dollars, so writing
+ * the riel figure into a USD field overcharges by the exchange rate (for KHR,
+ * about four thousand times).
  *
  * Crossing currencies therefore goes through the market rate:
  *

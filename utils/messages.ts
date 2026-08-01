@@ -1,14 +1,13 @@
 // The contract between the PPP side panel and the pricing content script.
 //
 // The side panel is an extension page, so it can't touch the Play Console DOM
-// at all — every read and write goes through these messages. Prices are always
-// computed content-script side and sent over as plain data, so the two never
-// disagree about what a row should say.
+// at all — every read and write goes through these messages, and prices are
+// always computed content-script side and sent over as plain data.
 //
 // Settings ride along on each request rather than being watched separately in
-// the content script. That's deliberate: the panel writes a setting and scans
-// immediately, and a storage watch on the other side hasn't necessarily fired
-// yet, so the scan would silently use the previous value.
+// the content script: the panel writes a setting and scans immediately, and a
+// storage watch on the other side hasn't necessarily fired by then, so the scan
+// would silently use the previous value.
 
 import type { PppSettings } from './ppp';
 
@@ -24,16 +23,15 @@ export type PricingMessage =
   | { type: typeof PPP_SCAN; basePrice: number; settings?: PppSettings }
   | { type: typeof PPP_FILL; basePrice: number; settings: PppSettings }
   | { type: typeof PPP_ABORT }
-  // Drives the panel's progress bar. `done` counts rows actually committed
-  // and is only ever sent *after* a write lands, so it can't run ahead of
-  // reality; `total` is the length of the plan, which is exact because every
-  // price row is in the DOM before the walk starts.
+  // Drives the panel's progress bar. `done` is sent only *after* a write
+  // lands, so it can't run ahead of reality; `total` is the plan's length,
+  // exact because every price row is in the DOM before the walk starts.
   | { type: typeof PPP_PROGRESS; done: number; total: number };
 
 /**
  * One row of the preview, already converted and formatted.
  *
- * Every figure comes over pre-computed, in both the market's own currency and
+ * Every figure comes over pre-computed, in both the row's billing currency and
  * the base country's. The panel's "show in base currency" toggle is therefore
  * a pure view switch — it re-renders without re-scanning, and the two sides
  * can't disagree about what a row is worth.
@@ -45,7 +43,7 @@ export interface PppPreviewRow {
    * — Play Console bills Cambodia in USD and much of non-euro Europe in EUR.
    */
   currency: string;
-  /** The proposed price, in the market's own currency. */
+  /** The proposed price, in the billing currency above. */
   price: string;
   /** The same proposed price expressed in the base country's currency. */
   priceBase: string;
@@ -67,7 +65,9 @@ export interface PppPreviewRow {
 }
 
 export interface PppScanResult {
-  /** Price rows currently in the DOM. The table virtualises, so this grows. */
+  /**
+   * Every price row on the page — exact, since the table doesn't virtualise.
+   */
   scanned: number;
   rows: PppPreviewRow[];
 }

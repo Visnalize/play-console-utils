@@ -110,20 +110,17 @@ export function hasAnyModifier(modifier: ModifierKeys): boolean {
 
 // The physical key, independent of what the modifiers turned it into.
 //
-// This exists because `e.key` is not stable for letter shortcuts. On macOS,
-// Option+P reports `e.key === 'π'` (Option is the compose key there, so it
-// produces a different character entirely), and Shift+K reports 'K', not 'k'.
-// A shortcut stored as 'p' and matched on `e.key` alone therefore silently
-// never fires on a Mac — which is exactly how Alt+P shipped broken.
+// `e.key` is not stable for letter shortcuts: on macOS Option is a compose key,
+// so Option+P reports 'π', and Shift+K reports 'K'. A shortcut stored as 'p'
+// and matched on `e.key` alone therefore never fires on a Mac — which is how
+// Alt+P shipped broken. `e.code` names the key's *position* and is unaffected
+// by modifiers, so letters and digits go through it instead.
 //
-// `e.code` names the key's position on the keyboard and is unaffected by
-// modifiers, so letters and digits are matched through it instead. Non-Latin
-// layouts are a known gap: `code` is US-layout-relative, so a Cyrillic layout
-// matches the key where 'p' sits on a US board, not 'п'. That's the same
-// behaviour Chrome's own `commands` API has.
+// Known gap: `code` is US-layout-relative, so a Cyrillic layout matches the key
+// where 'p' sits on a US board. Chrome's own `commands` API behaves the same.
 //
-// Returns null for keys that aren't a letter or digit (Enter, ArrowDown, …),
-// where `e.key` is already stable and is used as-is.
+// Returns null for non-letter/digit keys (Enter, ArrowDown, …), where `e.key`
+// is already stable.
 function physicalKey(e: KeyboardEvent): string | null {
   const code = e.code ?? '';
   const letter = /^Key([A-Z])$/.exec(code);

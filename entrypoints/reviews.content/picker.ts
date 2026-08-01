@@ -113,9 +113,9 @@ function openPicker(replyEl: HTMLElement, templates: CannedReply[]) {
     row.type = 'button';
     row.className = ROW_CLASS;
 
-    // The digit renders as a key cap rather than a "1." text prefix so it reads
-    // as a shortcut. Rows past NUMBERED_ROWS keep an empty cap of the same width
-    // so every label stays on the same left edge.
+    // A key cap rather than a "1." prefix, so the digit reads as a shortcut
+    // and not as list numbering. Rows past NUMBERED_ROWS keep an empty cap of
+    // the same width so every label stays on one left edge.
     const key = document.createElement('span');
     const numbered = i < NUMBERED_ROWS;
     key.className = numbered ? KEY_CLASS : `${KEY_CLASS} ${KEY_EMPTY_CLASS}`;

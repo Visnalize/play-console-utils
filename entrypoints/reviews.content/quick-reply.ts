@@ -35,10 +35,9 @@ function findPublishButton(scope?: Element | null): HTMLElement | undefined {
   );
 }
 
-// Setting the reply's content programmatically still routes through Play
-// Console's Angular change detection before the publish button's disabled
-// state reflects it — that isn't synchronous with the dispatched input
-// event, so poll briefly instead of checking once right after the mutation.
+// The publish button's disabled state only reflects a programmatic write once
+// Angular's change detection has run, which isn't synchronous with the input
+// event — so poll rather than checking once right after the mutation.
 async function waitForEnabledPublishButton(
   scope: Element | null,
   timeoutMs = 3000,
@@ -104,10 +103,9 @@ export async function initQuickReply(ctx: ContentScriptContext) {
 
     const container = getReviewContainerOf(active);
 
-    // A throw from the on-device translation APIs (an unavailable model, a
-    // download the page isn't allowed to start) would otherwise reject this
-    // async listener and skip publishing entirely, with nothing but an
-    // unhandled rejection to show for it.
+    // A throw from the on-device translation APIs (unavailable model, a
+    // download the page can't start) would otherwise reject this async listener
+    // and skip publishing entirely, leaving only an unhandled rejection.
     let translated = false;
     if (autoTranslate()) {
       try {

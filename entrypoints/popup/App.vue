@@ -38,9 +38,8 @@
     </p>
 
     <template v-else>
-      <!-- Enabled only where it can actually do something: a price editor
-           with rows we recognise. The title carries the why and the shortcut,
-           so the control stays a single button. -->
+      <!-- Enabled only where it can do something: a price editor with rows we
+           recognise. -->
       <button
         type="button"
         class="btn-block font-normal btn btn-sm btn-primary"
@@ -202,10 +201,10 @@ onMounted(async () => {
 
   if (isOnConsole.value && tab?.id !== undefined) {
     try {
-      // Counts only — no base price or settings needed just to enable a
-      // button. Typed as PricingMessage so the compiler checks the payload;
-      // tabs.sendMessage itself takes `any`, which is how a missing required
-      // field once shipped as a silently disabled button.
+      // Counts only — enabling a button needs no base price or settings.
+      // Annotated as PricingMessage so the compiler checks the payload;
+      // tabs.sendMessage takes `any`, which is how a missing required field
+      // once shipped as a silently disabled button.
       const message: PricingMessage = { type: PPP_SCAN, basePrice: 0 };
       ppp.value = await browser.tabs.sendMessage(tab.id, message);
     } catch {

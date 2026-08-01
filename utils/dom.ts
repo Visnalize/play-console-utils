@@ -126,13 +126,12 @@ function selectAllIn(el: HTMLElement) {
 }
 
 // Replaces the field's content the way a user would: select everything, then
-// type over it. execCommand is deprecated but it's still the only API that
-// runs the browser's real editing pipeline, which matters twice over here —
-// it emits trusted beforeinput/input events Play Console's Angular bindings
-// can't miss, and it keeps the caret (and therefore focus) inside the field.
-// Assigning `.innerText` instead tears out the node the caret lives in, which
-// drops focus out of a contenteditable reply box and takes Play Console's
-// reply toolbar — Publish button included — down with it.
+// type over it. execCommand is deprecated but is still the only API that runs
+// the browser's real editing pipeline, which matters twice here — it emits
+// trusted beforeinput/input events Angular can't miss, and it keeps the caret
+// (and so the focus) inside the field. Assigning `.innerText` instead tears out
+// the node the caret lives in, dropping focus out of a contenteditable reply
+// box and collapsing Play Console's reply toolbar, Publish button included.
 export function setReplyText(el: HTMLElement, text: string) {
   el.focus({ preventScroll: true });
   try {
@@ -166,12 +165,11 @@ export interface PriceRow {
   /** The price cell's current text, e.g. "INR 100.00". Empty if unset. */
   valueText: string;
   /**
-   * Click target that opens this row's price editor: the price cell itself.
-   *
-   * Not the `.ess-edit-icon` inside it — that icon is only the visible
-   * affordance, and targeting it meant dealing with its `transparent` class
-   * and the cell's `trigger-hover`, i.e. synthesising a hover first. The cell
-   * takes a plain click, so none of that is needed.
+   * Click target that opens this row's price editor: the price cell itself,
+   * not the `.ess-edit-icon` inside it. That icon is only the visible
+   * affordance, and hitting it means synthesising a hover first (its
+   * `transparent` class, the cell's `trigger-hover`); the cell takes a plain
+   * click instead.
    */
   edit: HTMLElement | null;
   /** Direct input, for price surfaces rendered as a plain form instead. */
@@ -199,10 +197,10 @@ export function toPriceRow(row: HTMLElement): PriceRow | null {
   // would otherwise be scanned (and counted) as one that simply didn't match.
   if (row.querySelector(COLUMN_HEADER)) return null;
 
-  // So does a collapsible group header ("Other countries / regions (USD)").
-  // It has no price of its own and nothing to edit, but its label contains a
-  // currency code — so without this it matched USD/EUR and showed a bogus
-  // averaged price for a row that can't be filled at all.
+  // So does a collapsible group header ("Other countries / regions (USD)"),
+  // which has no price and nothing to edit — but its label contains a currency
+  // code, so without this it matches USD/EUR and shows a bogus averaged price
+  // for a row that can't be filled at all.
   if (row.querySelector(PRICE_GROUP_TOGGLE)) return null;
 
   // Preferred shape — the real Play Console price table (see selectors.ts).
@@ -266,12 +264,11 @@ export function getPriceInputValue(input: HTMLInputElement): string {
   return input.value.trim();
 }
 
-// Writes a price the way setReplyText writes a reply, and for the same reason:
-// execCommand runs the browser's real editing pipeline, so Angular sees
-// trusted input events rather than a silent property assignment it never
-// notices. Falls back to the native value setter — Angular overrides `value`
-// on the element instance, so assigning `input.value` directly can be
-// swallowed; the prototype's setter is the one that actually writes through.
+// Writes a price the way setReplyText writes a reply, and for the same reason.
+// The fallback uses the prototype's native value setter rather than
+// `input.value = …`: Angular overrides `value` on the element *instance*, so a
+// direct assignment can be swallowed. It deliberately never blurs — that would
+// close the editor popup before the value commits.
 export function setPriceInputValue(input: HTMLInputElement, value: string) {
   input.focus({ preventScroll: true });
   try {

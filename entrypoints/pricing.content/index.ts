@@ -54,10 +54,10 @@ export default defineContentScript({
       sendResponse: (response: PppScanResult | PppFillResult) => void,
     ) {
       if (message?.type === PPP_SCAN) {
-        // An exception here would leave the reply channel hanging, and the
-        // sender can't tell that apart from "no content script on this tab" —
-        // which is how a required-field mistake showed up as a permanently
-        // disabled popup button rather than an error.
+        // A throw here leaves the reply channel hanging, which the sender
+        // can't tell apart from "no content script on this tab" — that's how a
+        // required-field mistake surfaced as a permanently disabled popup
+        // button instead of an error.
         try {
           sendResponse(scanPrices(message.basePrice, message.settings));
         } catch (err) {

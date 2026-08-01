@@ -2,16 +2,15 @@
 // Regenerates utils/ppp-data.ts from the World Bank's PPP conversion factor
 // indicator (PA.NUS.PPP — "local currency units per international $").
 //
-// The dataset is committed rather than fetched at runtime: the extension then
-// needs no extra host permission, works offline, and shows users no new
-// install-time warning. The tradeoff is that the numbers only move when
-// somebody reruns this script — `pnpm ppp:refresh`.
+// The dataset is committed rather than fetched at runtime: the extension needs
+// no extra host permission, works offline, and shows no new install-time
+// warning. The tradeoff is that the numbers only move when somebody reruns
+// this script — `pnpm ppp:refresh`.
 //
 // World Bank publishes PPP against ISO-3166 countries but says nothing about
-// which currency each one prices in, so CURRENCY_BY_COUNTRY below is the one
-// hand-maintained input. A country missing from it is dropped from the output
-// (and reported), because a PPP factor without its currency can't be rendered
-// as a price.
+// which currency each prices in, so CURRENCY_BY_COUNTRY below is the one
+// hand-maintained input. A country missing from it is dropped and reported —
+// a PPP factor without its currency can't be rendered as a price.
 import { writeFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 

@@ -5,10 +5,9 @@
       <h1 class="font-semibold text-base">PPP pricing</h1>
     </header>
 
-    <!-- `&& !result`: this branch replaces the entire panel, so a single
-         failed message must not throw away a fill that already finished. The
-         rescan that runs after a fill is exactly such a message, and losing
-         it meant the summary was swapped for "reload this page". -->
+    <!-- `&& !result`: this branch replaces the entire panel, so one failed
+         message must not throw away a fill that already finished — and the
+         rescan that runs right after a fill is exactly such a message. -->
     <p v-if="unreachable && !result" class="opacity-70 text-sm">
       Open a Play Console price editor in this tab. If the page was already open
       when the extension was installed, reload it first.
@@ -160,10 +159,10 @@
             </span>
             <span class="tabular-nums shrink-0">{{ displayPrice(row) }}</span>
           </div>
-          <!-- Only when there's a difference worth showing: an unpriced market
-               has nothing to compare against, and a row already sitting at the
-               target would otherwise add a "was … no change" line to every
-               single row the moment a fill finishes. -->
+          <!-- Only when there's a difference worth showing. An unpriced market
+               has nothing to compare against, and without the rounds-to-zero
+               check every row grows a "was … no change" line once a fill
+               finishes. -->
           <div
             v-if="hasChange(row)"
             class="flex justify-between items-baseline gap-3 text-xs"

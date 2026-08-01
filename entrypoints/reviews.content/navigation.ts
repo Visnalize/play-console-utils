@@ -30,12 +30,10 @@ import { showToast } from '@/utils/toast';
 // skipped as soon as you've scrolled past its top edge by a few pixels.
 const CURRENT_THRESHOLD_PX = 80;
 
-// A review that's already been replied to has no reply field to focus, so
-// after landing on one there's nothing focused to derive "where you are"
-// from. Remembering the last review we navigated to keeps forward navigation
-// moving past it instead of resolving the current review from stale focus (or
-// from a viewport position the smooth scroll hasn't reached yet) and
-// targeting the same replied review over and over.
+// An already-replied review has no reply field to focus, so after landing on
+// one there's nothing focused to derive "where you are" from — and without
+// this, forward navigation resolves the current review from the stale focus
+// left behind and re-targets that same review over and over.
 let lastNavigatedContainer: HTMLElement | null = null;
 
 function getFocusedReviewContainer(): HTMLElement | null {
@@ -54,11 +52,10 @@ function getCurrentIndexByViewport(containers: HTMLElement[]): number {
   return currentIndex;
 }
 
-// Prefer the review whose reply field you're actively focused in — it's a
-// more precise "where you are" than the viewport-position guess, e.g. if
-// you've scrolled slightly while typing a reply. The review we last navigated
-// to comes next, and only then the viewport; both earlier answers are dropped
-// if the list has re-rendered out from under them.
+// Three tiers, most precise first: the reply field you're focused in, then the
+// review we last navigated to (which also covers the window before a smooth
+// scroll lands), then the viewport. The first two are dropped if the list has
+// re-rendered out from under them.
 function getCurrentIndex(containers: HTMLElement[]): number {
   const focusedContainer = getFocusedReviewContainer();
   if (focusedContainer) {
@@ -72,10 +69,9 @@ function getCurrentIndex(containers: HTMLElement[]): number {
   return getCurrentIndexByViewport(containers);
 }
 
-// Leaving a review with an unpublished draft would strand it there
-// indefinitely — clicking Discard resets it instead of letting stray drafts
-// pile up across the list as you navigate through it. An unfocused or already
-// empty reply field is left alone.
+// Clicking Discard on the way out, so navigating the list doesn't leave a
+// trail of stranded half-typed replies. An unfocused or empty field is left
+// alone.
 function discardUnpublishedDraft(container: Element) {
   const replyField = findReplyFieldIn(container);
   if (!replyField || document.activeElement !== replyField) return;
@@ -112,8 +108,7 @@ function navigateReview(isNext: boolean) {
   const replyField = findReplyFieldIn(target);
   replyField?.focus({ preventScroll: true });
   // Nothing to focus on an already-replied review — drop the focus we're
-  // leaving behind rather than let the previous review keep claiming to be
-  // the current one.
+  // leaving behind, or the previous review keeps claiming to be the current one.
   if (document.activeElement !== replyField) getFocusedReplyField()?.blur();
 }
 
