@@ -22,7 +22,7 @@ import {
 } from '@/utils/dom';
 import { ORIGINAL_LANGUAGE_HEADER, PUBLISH_LABELS } from '@/utils/selectors';
 import { watchValue } from '@/utils/watch';
-import { showToast } from './toast';
+import { showToast } from '@/utils/toast';
 
 // Scoped to the review being replied to where possible: PUBLISH_LABELS is
 // matched as a substring against text *or* aria-label, so a document-wide

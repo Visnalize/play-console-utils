@@ -108,6 +108,46 @@ export function hasAnyModifier(modifier: ModifierKeys): boolean {
   return modifier.ctrlOrMeta || modifier.shift || modifier.alt;
 }
 
+// The physical key, independent of what the modifiers turned it into.
+//
+// This exists because `e.key` is not stable for letter shortcuts. On macOS,
+// Option+P reports `e.key === 'π'` (Option is the compose key there, so it
+// produces a different character entirely), and Shift+K reports 'K', not 'k'.
+// A shortcut stored as 'p' and matched on `e.key` alone therefore silently
+// never fires on a Mac — which is exactly how Alt+P shipped broken.
+//
+// `e.code` names the key's position on the keyboard and is unaffected by
+// modifiers, so letters and digits are matched through it instead. Non-Latin
+// layouts are a known gap: `code` is US-layout-relative, so a Cyrillic layout
+// matches the key where 'p' sits on a US board, not 'п'. That's the same
+// behaviour Chrome's own `commands` API has.
+//
+// Returns null for keys that aren't a letter or digit (Enter, ArrowDown, …),
+// where `e.key` is already stable and is used as-is.
+function physicalKey(e: KeyboardEvent): string | null {
+  const code = e.code ?? '';
+  const letter = /^Key([A-Z])$/.exec(code);
+  if (letter) return letter[1].toLowerCase();
+  const digit = /^Digit([0-9])$/.exec(code);
+  if (digit) return digit[1];
+  return null;
+}
+
+/**
+ * What to persist when recording a shortcut, so a Mac user pressing Alt+P
+ * stores 'p' rather than 'π' and the options page displays something legible.
+ */
+export function shortcutKeyOf(e: KeyboardEvent): string {
+  return physicalKey(e) ?? e.key;
+}
+
+function matchesKey(e: KeyboardEvent, key: string): boolean {
+  const wanted = key.toLowerCase();
+  // The `e.key` arm is kept for shortcuts recorded before this normalisation
+  // existed (a stored 'π' still matches), and for named keys like ArrowDown.
+  return e.key?.toLowerCase() === wanted || physicalKey(e) === wanted;
+}
+
 // Modifier matching is exact on every flag, so distinct configured combos
 // can't collide with each other.
 function matchesModifiers(
@@ -125,7 +165,7 @@ export function matchesKeyShortcut(
   e: KeyboardEvent,
   shortcut: KeyShortcut,
 ): boolean {
-  return matchesModifiers(e, shortcut) && e.key === shortcut.key;
+  return matchesModifiers(e, shortcut) && matchesKey(e, shortcut.key);
 }
 
 export function matchesParseReviewModifier(
@@ -142,6 +182,12 @@ export function formatShortcut(
   if (shortcut.ctrlOrMeta) parts.push('Ctrl/⌘');
   if (shortcut.shift) parts.push('Shift');
   if (shortcut.alt) parts.push('Alt');
-  if (shortcut.key) parts.push(shortcut.key);
+  // Letters are stored lowercase (see shortcutKeyOf) but read better as caps
+  // on a key cap — "Alt + P", not "Alt + p". Named keys keep their own casing.
+  if (shortcut.key) {
+    parts.push(
+      shortcut.key.length === 1 ? shortcut.key.toUpperCase() : shortcut.key,
+    );
+  }
   return parts.join(' + ') || '(none)';
 }

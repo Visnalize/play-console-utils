@@ -1,0 +1,4 @@
+@import '../../assets/ui.css';
+/* Required: ui.css uses `source(none)`, so an entrypoint that doesn't declare
+   its own directory gets none of its classes emitted (see CLAUDE.md). */
+@source './';

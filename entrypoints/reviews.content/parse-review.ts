@@ -14,7 +14,7 @@ import {
   getReviewText,
 } from '@/utils/dom';
 import { watchValue } from '@/utils/watch';
-import { showToast } from './toast';
+import { showToast } from '@/utils/toast';
 
 // Google's image URLs take a size suffix; s50 keeps the copied avatar small.
 const AVATAR_SIZE_SUFFIX = '=s50';

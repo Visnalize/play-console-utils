@@ -20,7 +20,11 @@
 
 <script setup lang="ts">
 import { computed, onBeforeUnmount, ref } from 'vue';
-import { formatShortcut, type KeyShortcut } from '@/utils/shortcuts';
+import {
+  formatShortcut,
+  shortcutKeyOf,
+  type KeyShortcut,
+} from '@/utils/shortcuts';
 import { RotateCcw } from '@lucide/vue';
 
 const props = defineProps<{
@@ -48,7 +52,9 @@ function onKeydown(e: KeyboardEvent) {
     ctrlOrMeta: e.ctrlKey || e.metaKey,
     shift: e.shiftKey,
     alt: e.altKey,
-    key: e.key,
+    // Not e.key: on macOS that's 'π' for Alt+P, which then only ever matches
+    // on a Mac with the same layout. shortcutKeyOf stores the physical key.
+    key: shortcutKeyOf(e),
   });
   stopRecording();
 }

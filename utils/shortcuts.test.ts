@@ -11,6 +11,7 @@ import {
   hasAnyModifier,
   matchesKeyShortcut,
   matchesParseReviewModifier,
+  shortcutKeyOf,
 } from './shortcuts';
 
 function keyEvent(init: Partial<KeyboardEvent>): KeyboardEvent {
@@ -185,6 +186,116 @@ describe('hasAnyModifier', () => {
   });
 });
 
+// A letter shortcut matched on e.key alone silently never fires on macOS,
+// where Option is a compose key: Option+P reports 'π'. No shipped default is
+// a letter+Alt combo, but any shortcut the user records could be.
+const ALT_P = { ctrlOrMeta: false, shift: false, alt: true, key: 'p' };
+
+describe('letter shortcuts across keyboard layouts', () => {
+  it('matches Alt+P when macOS reports the composed character', () => {
+    expect(
+      matchesKeyShortcut(
+        keyEvent({
+          altKey: true,
+          key: 'π',
+          code: 'KeyP',
+        } as Partial<KeyboardEvent>),
+        ALT_P,
+      ),
+    ).toBe(true);
+  });
+
+  it('still matches Alt+P where the key value is plain', () => {
+    expect(
+      matchesKeyShortcut(
+        keyEvent({
+          altKey: true,
+          key: 'p',
+          code: 'KeyP',
+        } as Partial<KeyboardEvent>),
+        ALT_P,
+      ),
+    ).toBe(true);
+  });
+
+  it('matches regardless of the key value casing', () => {
+    expect(
+      matchesKeyShortcut(
+        keyEvent({
+          altKey: true,
+          key: 'P',
+          code: 'KeyP',
+        } as Partial<KeyboardEvent>),
+        ALT_P,
+      ),
+    ).toBe(true);
+  });
+
+  it('does not match a different physical key that composed to the same char', () => {
+    expect(
+      matchesKeyShortcut(
+        keyEvent({
+          altKey: true,
+          key: 'π',
+          code: 'KeyQ',
+        } as Partial<KeyboardEvent>),
+        ALT_P,
+      ),
+    ).toBe(false);
+  });
+
+  // A shortcut recorded before this normalisation existed stored the composed
+  // character; it has to keep working rather than silently stop matching.
+  it('still honours a shortcut stored as the composed character', () => {
+    expect(
+      matchesKeyShortcut(
+        keyEvent({
+          altKey: true,
+          key: 'π',
+          code: 'KeyP',
+        } as Partial<KeyboardEvent>),
+        { ctrlOrMeta: false, shift: false, alt: true, key: 'π' },
+      ),
+    ).toBe(true);
+  });
+
+  it('leaves named keys matching on their key value', () => {
+    expect(
+      matchesKeyShortcut(
+        keyEvent({
+          altKey: true,
+          key: 'ArrowDown',
+          code: 'ArrowDown',
+        } as Partial<KeyboardEvent>),
+        DEFAULT_NEXT_REVIEW_SHORTCUT,
+      ),
+    ).toBe(true);
+  });
+});
+
+describe('shortcutKeyOf', () => {
+  it('records the physical letter, not the composed character', () => {
+    expect(
+      shortcutKeyOf(
+        keyEvent({ key: 'π', code: 'KeyP' } as Partial<KeyboardEvent>),
+      ),
+    ).toBe('p');
+    expect(
+      shortcutKeyOf(
+        keyEvent({ key: '¡', code: 'Digit1' } as Partial<KeyboardEvent>),
+      ),
+    ).toBe('1');
+  });
+
+  it('falls back to the key value for named keys', () => {
+    expect(
+      shortcutKeyOf(
+        keyEvent({ key: 'ArrowUp', code: 'ArrowUp' } as Partial<KeyboardEvent>),
+      ),
+    ).toBe('ArrowUp');
+  });
+});
+
 describe('formatShortcut', () => {
   it('formats the default quick-reply shortcut', () => {
     expect(formatShortcut(DEFAULT_QUICK_REPLY_SHORTCUT)).toBe('Ctrl/⌘ + Enter');
@@ -192,6 +303,10 @@ describe('formatShortcut', () => {
 
   it('formats a modifier-only shortcut', () => {
     expect(formatShortcut(DEFAULT_PARSE_REVIEW_MODIFIER)).toBe('Alt');
+  });
+
+  it('upper-cases a single-character key so it reads as a key cap', () => {
+    expect(formatShortcut(DEFAULT_CANNED_REPLY_SHORTCUT)).toBe('Ctrl/⌘ + K');
   });
 
   it('formats an empty modifier set as "(none)"', () => {

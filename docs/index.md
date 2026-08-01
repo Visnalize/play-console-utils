@@ -1,7 +1,7 @@
 ---
 layout: home
 title: Keyboard shortcuts for the Google Play Console
-description: Play Console Utils is a free Chrome extension for the Google Play Console. Publish review replies with one keyboard shortcut, auto-translate them on-device, insert canned reply templates, navigate reviews, and copy any review as JSON.
+description: Play Console Utils is a free Chrome extension for the Google Play Console. Publish review replies with one keyboard shortcut, auto-translate them on-device, insert canned reply templates, navigate reviews, set regional prices by purchasing power parity, and copy any review as JSON.
 
 hero:
   name: Play Console Utils
@@ -28,6 +28,9 @@ features:
   - icon: ↕️
     title: Review navigation
     details: Jump to the next or previous review - or page through the list - from the keyboard. The review you land on is highlighted with its reply box focused, and any draft you leave behind is discarded.
+  - icon: 🌍
+    title: PPP regional pricing
+    details: Enter one base price in a side panel and fill every market's price at purchasing power parity, with your choice of rounding and a custom factor slider. World Bank data for 200+ countries ships with the extension.
   - icon: 🔍
     title: Parse review
     details: Modifier+click a review to copy its author, date, content, avatar URL, and app slug as JSON to your clipboard.

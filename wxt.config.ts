@@ -14,10 +14,13 @@ export default defineConfig({
       __VUE_PROD_DEVTOOLS__: 'false',
     },
   }),
-  manifest: {
+  // A function, not an object, so the side-panel permission can be Chrome-only:
+  // Firefox has no `sidePanel` permission (WXT maps the entrypoint to
+  // `sidebar_action` there) and would flag it as unknown.
+  manifest: ({ browser }) => ({
     name: 'Play Console Utils',
     description: 'Productivity utilities and shortcuts for Google Play Console',
-    permissions: ['storage'],
+    permissions: browser === 'firefox' ? ['storage'] : ['storage', 'sidePanel'],
     host_permissions: [CONSOLE_URL_MATCH_PATTERN],
     icons: {
       16: '/icons/icon16.png',
@@ -31,5 +34,5 @@ export default defineConfig({
         128: '/icons/gray/icon128.png',
       },
     },
-  },
+  }),
 });

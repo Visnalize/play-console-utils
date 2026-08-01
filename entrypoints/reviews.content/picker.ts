@@ -14,7 +14,7 @@ import {
   setReplyText,
 } from '@/utils/dom';
 import { watchValue } from '@/utils/watch';
-import { showToast } from './toast';
+import { showToast } from '@/utils/toast';
 
 const PANEL_CLASS = 'pcu-picker';
 const HEADER_CLASS = 'pcu-picker__header';

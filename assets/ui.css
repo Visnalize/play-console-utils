@@ -22,7 +22,7 @@
    below WCAG AA; these darker values are the ones the hand-written CSS used and
    clear 4.5:1. Everything else stays daisyUI's. */
 :root {
-  --color-primary: #4285f4; /* Play/Google blue, kept from the old footer link */
+  --color-primary: #0b57d0; /* Play/Google blue, kept from the old footer link */
   --color-primary-content: #fff;
   --color-success: #2e7d32;
   --color-success-content: #fff;
@@ -35,21 +35,21 @@
 @layer components {
   /* Options-page section, separated from the previous one by a rule. */
   .page-section {
-    @apply border-t border-base-300 pt-6 first-of-type:border-t-0 first-of-type:pt-0;
+    @apply pt-6 first-of-type:pt-0 border-base-300 border-t first-of-type:border-t-0;
   }
 
   .section-title {
-    @apply flex items-center gap-2 text-lg font-semibold;
+    @apply flex items-center gap-2 font-semibold text-lg;
   }
 
   /* Autosave confirmation line. The reserved height keeps the section from
      shifting when the message appears and clears. */
   .save-status {
-    @apply min-h-5 text-sm text-success;
+    @apply min-h-5 text-success text-sm;
   }
 
   /* Row-removal button in every editable list, and in the popup's saved list. */
   .remove-btn {
-    @apply btn btn-sm btn-square btn-ghost text-error;
+    @apply text-error btn btn-sm btn-square btn-ghost;
   }
 }
