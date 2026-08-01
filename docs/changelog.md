@@ -9,6 +9,16 @@ All notable changes to Play Console Utils are documented in this file.
 
 <!-- changelog-insert -->
 
+## [1.3.0] - 2026-08-01
+
+- refactor: PPP pricing panel UI (54507b6)
+- chore: cleanup docs and trim code comments (7eb346c)
+- feat: PPP regional pricing side panel (a1b81b5)
+- docs: update and SEO (ae43332)
+
+**Full Changelog**: https://github.com/Visnalize/play-console-utils/compare/v1.2.1...v1.3.0
+
+
 ## [1.2.1] - 2026-07-30
 
 - chore: update README (6e17ecd)
