@@ -14,212 +14,61 @@
     </p>
 
     <template v-else>
-      <label class="block text-sm">
-        <span class="block mb-1">Base price — {{ baseLabel }}</span>
-        <input
-          ref="priceInput"
-          v-model="basePrice"
-          type="text"
-          inputmode="decimal"
-          class="w-full input input-sm"
-          :placeholder="basePlaceholder"
-          :disabled="filling"
-        />
-      </label>
+      <PriceInputs
+        ref="priceInputs"
+        v-model:base-price="basePrice"
+        v-model:base-country="settings.baseCountry"
+        v-model:rounding="settings.rounding"
+        v-model:custom-factor="settings.customFactor"
+        v-model:overwrite-filled="settings.overwriteFilled"
+        :base-label="baseLabel"
+        :base-placeholder="basePlaceholder"
+        :countries="countries"
+        :disabled="filling"
+      />
 
-      <div>
-        <div class="flex justify-between items-baseline gap-2 mb-1 text-sm">
-          <span>Custom factor</span>
-          <span class="opacity-70 tabular-nums">{{ factorLabel }}</span>
-        </div>
-        <input
-          v-model.number="settings.customFactor"
-          type="range"
-          class="w-full range range-xs range-primary"
-          :min="MIN_CUSTOM_FACTOR"
-          :max="MAX_CUSTOM_FACTOR"
-          :step="CUSTOM_FACTOR_STEP"
-          :disabled="filling"
-        />
-      </div>
-
-      <!-- The dials you set once, tucked away so the price list stays the
-           focus of a narrow panel. -->
-      <details class="text-sm">
-        <summary class="opacity-70 cursor-pointer">Settings</summary>
-        <div class="flex flex-col gap-2 mt-2">
-          <label class="block">
-            <span class="block opacity-70 mb-1">Base country</span>
-            <select
-              v-model="settings.baseCountry"
-              class="w-full select-sm select"
-              :disabled="filling"
-            >
-              <option v-for="c in countries" :key="c.code" :value="c.code">
-                {{ c.name }} ({{ c.currency }})
-              </option>
-            </select>
-          </label>
-          <label class="block">
-            <span class="block opacity-70 mb-1">Rounding</span>
-            <select
-              v-model="settings.rounding"
-              class="w-full select-sm select"
-              :disabled="filling"
-            >
-              <option
-                v-for="m in ROUNDING_MODES"
-                :key="m.value"
-                :value="m.value"
-              >
-                {{ m.label }}
-              </option>
-            </select>
-          </label>
-          <label class="text-sm label">
-            <input
-              v-model="settings.overwriteFilled"
-              type="checkbox"
-              class="checkbox checkbox-sm"
-              :disabled="filling"
-            />
-            Overwrite prices that already have a value
-          </label>
-        </div>
-      </details>
-
-      <div class="flex justify-between items-center gap-2">
-        <!-- While filling, the summary line becomes the progress bar: the
-             plan's length is exact (every row is in the DOM before the walk
-             starts), so this is a real fraction rather than a guess. -->
-        <div
-          v-if="filling"
-          class="flex flex-1 items-center gap-2 min-w-0"
-          role="status"
-          :aria-label="`Filled ${progress.done} of ${progress.total} prices`"
-        >
-          <progress
-            class="flex-1 progress progress-primary"
-            :value="progress.done"
-            :max="Math.max(progress.total, 1)"
-          />
-          <span class="opacity-70 tabular-nums text-xs shrink-0">
-            {{ progress.done }}/{{ progress.total }}
-          </span>
-        </div>
-        <p v-else class="opacity-70 text-sm">{{ summary }}</p>
-        <!-- Both are disabled mid-fill anyway; hiding them gives the bar the
-             whole row instead of squeezing it into what's left. -->
-        <div v-if="!filling" class="flex items-center shrink-0">
-          <!-- btn-active on its own reads the same as btn-ghost's hover
-               state, so the tinted icon is what makes "on" unambiguous. -->
-          <div class="tooltip tooltip-end" :data-tip="baseToggleLabel">
-            <button
-              type="button"
-              class="btn btn-xs btn-ghost"
-              :class="{ 'btn-active text-primary': showBase }"
-              :aria-pressed="showBase"
-              :aria-label="baseToggleLabel"
-              :disabled="filling || !baseCurrency"
-              @click="showBase = !showBase"
-            >
-              <Coins :size="13" />
-            </button>
-          </div>
-          <div class="tooltip tooltip-end" data-tip="Rescan price rows">
-            <button
-              type="button"
-              class="btn btn-xs btn-ghost"
-              aria-label="Rescan price rows"
-              :disabled="filling"
-              @click="rescan"
-            >
-              <RefreshCw :size="13" />
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <div class="flex-1 min-h-0 overflow-y-auto">
-        <div
-          v-for="row in rows"
-          :key="row.market"
-          class="hover:bg-base-300 px-2 py-1 border-base-200 border-t"
-          :class="{ 'opacity-40': row.skipped }"
-        >
-          <div class="flex justify-between items-baseline gap-3 text-sm">
-            <span class="min-w-0 truncate">
-              {{ row.market }}
-              <span
-                v-if="row.approximate"
-                class="opacity-60 cursor-help"
-                :title="`Averaged across all ${row.currency} countries`"
-                >≈</span
-              >
-            </span>
-            <span class="tabular-nums shrink-0">{{ displayPrice(row) }}</span>
-          </div>
-          <!-- Only when there's a difference worth showing. An unpriced market
-               has nothing to compare against, and without the rounds-to-zero
-               check every row grows a "was … no change" line once a fill
-               finishes. -->
-          <div
-            v-if="hasChange(row)"
-            class="flex justify-between items-baseline gap-3 text-xs"
-          >
-            <span class="opacity-60 min-w-0 truncate"
-              >was {{ displayCurrent(row) }}</span
-            >
-            <span
-              class="tabular-nums shrink-0"
-              :class="changeClass(row.change)"
-              >{{ changeLabel(row.change) }}</span
-            >
-          </div>
-        </div>
-      </div>
-
-      <button
-        v-if="!filling"
-        type="button"
-        class="btn-block font-normal btn btn-primary"
-        :disabled="fillable === 0"
-        @click="startFill"
+      <!-- A distinct, shaded surface for the scanned results — set apart from
+           the plain controls above so "what you set" and "what it found" read
+           as two different zones in a narrow panel. -->
+      <div
+        class="flex flex-col flex-1 gap-2 bg-base-200/70 p-3 border border-base-300 rounded-box min-h-0"
       >
-        Fill prices
-      </button>
-      <button
-        v-else
-        type="button"
-        class="btn-block btn-outline font-normal btn btn-error"
-        @click="stopFill"
-      >
-        Stop
-      </button>
+        <PreviewToolbar
+          v-model:show-base="showBase"
+          :filling="filling"
+          :progress="progress"
+          :summary="summary"
+          :base-currency="baseCurrency"
+          :base-toggle-label="baseToggleLabel"
+          @rescan="rescan"
+        />
+        <PreviewList
+          :rows="rows"
+          :show-base="showBase"
+          :base-currency="baseCurrency"
+        />
+      </div>
 
-      <p class="opacity-60 text-xs leading-snug">
-        Each price goes in through Play Console's own editor, one row at a time.
-        Nothing is saved until you press Save in Play Console.
-        <template v-if="convertedCount">
-          {{ convertedCount }}
-          {{ convertedCount === 1 ? 'market is' : 'markets are' }} billed in a
-          currency that isn't their own, so those use an exchange rate as well
-          as purchasing power — they'll drift as rates move.
-        </template>
-      </p>
+      <FillControls
+        :filling="filling"
+        :fillable="fillable"
+        :converted-count="convertedCount"
+        @fill="startFill"
+        @stop="stopFill"
+      />
     </template>
   </main>
 </template>
 
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, reactive, ref, watch } from 'vue';
-import { Coins, Globe, RefreshCw } from '@lucide/vue';
+import { Globe } from '@lucide/vue';
+import FillControls from './FillControls.vue';
+import PreviewList from './PreviewList.vue';
+import PreviewToolbar from './PreviewToolbar.vue';
+import PriceInputs from './PriceInputs.vue';
 import {
-  CUSTOM_FACTOR_STEP,
   DEFAULT_PPP_SETTINGS,
-  MAX_CUSTOM_FACTOR,
-  MIN_CUSTOM_FACTOR,
-  ROUNDING_MODES,
   getPppCountry,
   listPppCountries,
   pppSettingsItem,
@@ -249,7 +98,7 @@ const showBase = ref(false);
 const progress = ref({ done: 0, total: 0 });
 const result = ref<PppFillResult | null>(null);
 const settings = reactive<PppSettings>({ ...DEFAULT_PPP_SETTINGS });
-const priceInput = ref<HTMLInputElement | null>(null);
+const priceInputs = ref<InstanceType<typeof PriceInputs> | null>(null);
 const countries = listPppCountries();
 
 let tabId: number | undefined;
@@ -277,44 +126,6 @@ const baseToggleLabel = computed(() =>
     ? `Show every price in ${baseCurrency.value}`
     : 'Show every price in the base currency',
 );
-
-// A view switch, not a setting: both figures already came over on the scan, so
-// this re-renders without touching the page or the stored config.
-function displayPrice(row: PppPreviewRow): string {
-  return showBase.value
-    ? `${baseCurrency.value} ${row.priceBase}`
-    : `${row.currency} ${row.price}`;
-}
-
-function displayCurrent(row: PppPreviewRow): string {
-  return showBase.value
-    ? `${baseCurrency.value} ${row.currentBase}`
-    : `${row.currency} ${row.current}`;
-}
-
-function hasChange(row: PppPreviewRow): boolean {
-  return row.change !== null && Math.round(row.change) !== 0;
-}
-
-// Rounded to whole percent — the panel is narrow and a decimal here is noise.
-// The arrow carries the direction too, so the colour isn't the only signal.
-function changeLabel(change: number | null): string {
-  if (change === null) return '';
-  const pct = Math.round(change);
-  return `${pct > 0 ? '↑' : '↓'} ${Math.abs(pct)}%`;
-}
-
-function changeClass(change: number | null): string {
-  return (change ?? 0) > 0 ? 'text-success' : 'text-primary';
-}
-
-// A bare "1.15" doesn't say much; the percentage is what the user is thinking.
-const factorLabel = computed(() => {
-  const f = settings.customFactor;
-  if (Math.abs(f - 1) < 0.001) return 'Raw PPP';
-  const pct = Math.round((f - 1) * 100);
-  return `${pct > 0 ? '+' : ''}${pct}%`;
-});
 
 const parsedPrice = computed(() => {
   const n = Number(basePrice.value.replace(/,/g, '').trim());
@@ -423,7 +234,7 @@ onMounted(async () => {
   browser.runtime.onMessage.addListener(onProgress);
   browser.tabs.onActivated.addListener(onTabChanged);
   await scan();
-  priceInput.value?.focus();
+  priceInputs.value?.focus();
 });
 
 onUnmounted(() => {

@@ -25,22 +25,31 @@ async function prompt(question) {
 async function main() {
   const branch = capture('git rev-parse --abbrev-ref HEAD');
   if (branch !== 'main') {
-    throw new Error(`Refusing to release from branch "${branch}" — switch to main first.`);
+    throw new Error(
+      `Refusing to release from branch "${branch}" — switch to main first.`,
+    );
   }
 
   if (capture('git status --porcelain')) {
-    throw new Error('Working tree is not clean — commit or stash changes before releasing.');
+    throw new Error(
+      'Working tree is not clean — commit or stash changes before releasing.',
+    );
   }
 
   run('git fetch origin main --quiet');
   if (capture('git rev-list HEAD..origin/main --count') !== '0') {
-    throw new Error('Local main is behind origin/main — pull before releasing.');
+    throw new Error(
+      'Local main is behind origin/main — pull before releasing.',
+    );
   }
 
-  let version = process.argv[2] ?? (await prompt('Enter release version (e.g. 1.2.0): '));
+  let version =
+    process.argv[2] ?? (await prompt('Enter release version (e.g. 1.2.0): '));
   version = version.replace(/^v/, '').trim();
   if (!/^\d+\.\d+\.\d+(-[0-9A-Za-z-.]+)?$/.test(version)) {
-    throw new Error(`Invalid version "${version}" — expected semver like 1.2.0`);
+    throw new Error(
+      `Invalid version "${version}" — expected semver like 1.2.0`,
+    );
   }
 
   const tag = `v${version}`;
@@ -63,7 +72,9 @@ async function main() {
   run('git push origin main');
   run(`git push origin ${tag}`);
 
-  console.log(`Pushed ${tag} — release workflow will build, publish, and update the changelog.`);
+  console.log(
+    `Pushed ${tag} — release workflow will build, publish, and update the changelog.`,
+  );
 }
 
 main().catch((err) => {
