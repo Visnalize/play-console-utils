@@ -2,6 +2,9 @@
 # of pure churn and, for the changelog, fights the release workflow that writes it.
 pnpm-lock.yaml
 docs/changelog.md
+# Regenerated wholesale by `pnpm ppp:refresh`; reformatting it would just make
+# the next refresh look like a 200-line diff.
+utils/ppp-data.ts
 
 # Build output
 .output

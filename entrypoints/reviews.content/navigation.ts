@@ -23,7 +23,7 @@ import {
   PREV_PAGE_LABELS,
 } from '@/utils/selectors';
 import { watchValue } from '@/utils/watch';
-import { showToast } from './toast';
+import { showToast } from '@/utils/toast';
 
 // A review whose top has scrolled slightly above the viewport top still
 // counts as "current" — otherwise the very review you're looking at gets

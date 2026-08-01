@@ -13,6 +13,9 @@ Save your go-to responses once, then press a keyboard shortcut (Ctrl/Cmd + K by 
 ⭐ REVIEW NAVIGATION
 Jump to the next or previous review with a keyboard shortcut (Alt + Down/Up by default) — no more scrolling and clicking through the list by hand. The review you land on is focused and ready to reply to. Page through the whole review list the same way with Alt + Right/Left. Either way, any unpublished draft you're leaving behind is discarded automatically instead of being left stranded.
 
+⭐ PPP REGIONAL PRICING
+Stop hand-typing 150 prices. Open a price editor in Play Console and click "Open PPP pricing panel" in the extension popup. A side panel opens: enter one base price, see it converted into every market's local currency at purchasing power parity, and fill every price in one go — with live progress and a Stop button. Every row shows what you charge there today next to the new price and the percentage up or down, and one toggle re-expresses the whole list in your base currency so you can compare markets side by side. Everything else is right there in the panel too: base country, rounding style (charm .99 or .90, nice round numbers, or exact), and a custom factor slider if you want to sit above or below raw parity. Nothing is saved until you press Save in Play Console yourself. Prices go in using the currency Play Console actually bills each market in — several are billed in US dollars or euros rather than their own currency, and those are converted properly instead of having a local-currency figure dropped into a dollar field. The World Bank conversion tables for 200+ countries ship inside the extension, so no data is fetched and nothing about your pricing leaves your browser.
+
 ⭐ CUSTOM APP SLUGS
 Map each app's name to your own short slug for use in the copied JSON, matching whatever naming scheme your team already uses.
 
