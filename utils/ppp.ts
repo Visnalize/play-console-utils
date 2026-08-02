@@ -15,9 +15,12 @@ import { PPP_COUNTRIES, type PppCountry } from './ppp-data';
 //
 // `customFactor` scales the result. Pure PPP charges the same real purchasing
 // power everywhere, which is often lower than a publisher wants; the factor is
-// the dial for "a bit above/below parity". It multiplies every market equally,
-// the base country included, so the model stays one multiplication with no
-// special cases — set it to 1 for untouched PPP.
+// the dial for "a bit above/below parity" — set it to 1 for untouched PPP.
+// It's pinned to 1 for the base market itself (see localAmount()): a premium
+// applied uniformly, base included, is mathematically identical to just
+// typing a different base price, and would silently rewrite the base
+// country's own row if it appears on the page. Excluding the base market is
+// what makes the factor a genuine lever rather than a redundant control.
 //
 // There is deliberately no "floor the discount at X% of base" knob: that bound
 // would need an FX rate on *every* market rather than only the cross-currency
@@ -159,9 +162,9 @@ function localAmount(
 ): number {
   if (!Number.isFinite(basePrice) || basePrice <= 0 || base.ppp <= 0) return 0;
   const internationalDollars = basePrice / base.ppp;
-  return (
-    internationalDollars * target.ppp * normalizeCustomFactor(customFactor)
-  );
+  const factor =
+    target.ppp === base.ppp ? 1 : normalizeCustomFactor(customFactor);
+  return internationalDollars * target.ppp * factor;
 }
 
 export function convertPrice(

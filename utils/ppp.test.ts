@@ -134,14 +134,16 @@ describe('convertPrice', () => {
     expect(up).toBeCloseTo(raw * 2, 2);
   });
 
-  // The factor multiplies uniformly, base country included — no special case.
-  it('applies the factor to the base country too', () => {
+  // Otherwise the factor would be a global rescale identical to just typing a
+  // different base price, and would silently rewrite the base country's own
+  // row if it's on the page.
+  it('does not apply the factor to the base country itself', () => {
     expect(
       convertPrice(4.99, us, PPP_COUNTRIES.US, {
         rounding: 'exact',
         customFactor: 0.5,
       }),
-    ).toBeCloseTo(2.5, 2);
+    ).toBeCloseTo(4.99, 2);
   });
 
   it('treats a missing factor as pure PPP', () => {
