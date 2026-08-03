@@ -1,9 +1,9 @@
 ---
 name: ship-feature
-description: Use when implementing a new feature (or any change to entrypoints/manifest/permissions) for the Play Console Utils extension. Makes sure the surrounding docs and manifest implications get updated alongside the code, and that anything vitest can't cover (background script, popup, toolbar icon, permissions) gets actually verified in a real browser before calling the work done.
+description: Use when implementing a new feature (or any change to entrypoints/manifest/permissions) for the ConsoleTurbo extension. Makes sure the surrounding docs and manifest implications get updated alongside the code, and that anything vitest can't cover (background script, popup, toolbar icon, permissions) gets actually verified in a real browser before calling the work done.
 ---
 
-# Shipping a feature in Play Console Utils
+# Shipping a feature in ConsoleTurbo
 
 Code changes alone aren't the deliverable here — this repo has docs and a
 release pipeline that assume every feature lands with its surrounding

@@ -72,7 +72,7 @@ export function useEditableList<T extends object>(config: {
       await config.item.setValue(config.sanitize(rows));
       flashSaved();
     } catch (err) {
-      console.error('Play Console Utils: failed to save settings.', err);
+      console.error('ConsoleTurbo: failed to save settings.', err);
       showError(config.quotaMessage);
     }
   }

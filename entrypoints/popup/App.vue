@@ -1,7 +1,7 @@
 <template>
   <main class="flex flex-col gap-4 p-4">
     <header class="flex justify-between items-center gap-2">
-      <h1 class="font-semibold text-base">Play Console Utils</h1>
+      <h1 class="font-semibold text-base">ConsoleTurbo</h1>
       <div class="flex gap-1 shrink-0">
         <div class="tooltip-bottom tooltip" data-tip="Options">
           <button

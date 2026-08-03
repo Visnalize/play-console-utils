@@ -1,39 +1,25 @@
-⭐ QUICK REPLY
-Press a keyboard shortcut (Ctrl/Cmd + Enter by default) while your cursor is in a reply box to publish it instantly, no mouse needed. Works with both plain and rich-text reply boxes, and recognizes the Publish button in English and Spanish.
+ConsoleTurbo adds keyboard-driven review replies, one-click JSON export, and bulk regional pricing to the Google Play Console — all running locally in your browser.
 
-⭐ AUTO-TRANSLATE REPLIES
-Write your reply in your own language — if the review was posted in a different language, your reply is automatically translated to match it before publishing. Translation runs fully on-device using Chrome's built-in AI, so nothing is ever sent over the network. Turn it off anytime from Options if you'd rather always publish exactly what you typed.
-
-⭐ PARSE REVIEW
-Hold a modifier key (Alt by default) and click any review's text to copy its details as JSON to your clipboard: author, date, app, content, and avatar image. A toast confirms the copy and briefly highlights the review.
+⭐ QUICK REPLY & AUTO-TRANSLATE
+Publish a reply instantly with a keyboard shortcut (Ctrl/Cmd + Enter by default), no mouse needed. Write in your own language — if the review was posted in a different one, your reply is auto-translated to match it before publishing, entirely on-device via Chrome's built-in AI. Turn it off anytime from Options if you'd rather always publish exactly what you typed.
 
 ⭐ CANNED REPLY TEMPLATES
-Save your go-to responses once, then press a keyboard shortcut (Ctrl/Cmd + K by default) while replying to pick one from a quick floating list. Templates can include the reviewer's name, the review date, and the app name as placeholders, automatically filled in before you publish.
+Save your go-to responses once, then press a shortcut (Ctrl/Cmd + K by default) to pick one from a floating list while replying. Templates support placeholders for the reviewer's name, review date, and app name, filled in automatically before you publish.
 
 ⭐ REVIEW NAVIGATION
-Jump to the next or previous review with a keyboard shortcut (Alt + Down/Up by default), or page through the whole list with Alt + Right/Left — no more scrolling and clicking by hand. The review you land on is focused and ready to reply to, and any unpublished draft you leave behind is discarded instead of being left stranded.
+Jump to the next or previous review (Alt + Down/Up by default) or page through the whole list (Alt + Right/Left), no scrolling or clicking by hand. Landing on a review focuses its reply box, and any unpublished draft you leave behind is discarded instead of left stranded.
+
+⭐ PARSE REVIEW TO JSON
+Hold a modifier key (Alt by default) and click any review to copy its author, date, app, content, and avatar image as JSON to your clipboard — a toast confirms the copy and briefly highlights the review.
 
 ⭐ PPP REGIONAL PRICING
-Stop hand-typing 150 prices. Open a price editor in Play Console, click "Open PPP pricing panel" in the popup, and enter one base price — the side panel converts it for every market at purchasing power parity and fills them all in one pass, with live progress and a Stop button.
+Stop hand-typing 150 prices. Open a price editor, enter one base price in the side panel, and it converts that price for every market at purchasing power parity, filling them all in one pass with live progress and a Stop button. Each row shows today's price next to the new one and the percent change, with a toggle to compare markets in your base currency, and you choose the rounding style (charm .99/.90, nice round numbers, or exact). Markets billed in USD or EUR rather than their own currency are converted correctly instead of getting a mismatched local figure. World Bank data for 200+ countries ships inside the extension, so nothing is fetched — and nothing is saved until you press Save in Play Console yourself.
 
-Every row shows what you charge there today next to the new price and the percentage up or down, and one toggle re-expresses the list in your base currency so you can compare markets side by side. Set your base country, rounding style (charm .99 or .90, nice round numbers, or exact), and a custom factor if you want to sit above or below raw parity.
-
-Prices go in using the currency Play Console actually bills each market in — several are billed in US dollars or euros rather than their own, and those are converted properly instead of having a local figure dropped into a dollar field. World Bank conversion tables for 200+ countries ship inside the extension, so nothing is fetched and nothing about your pricing leaves your browser. Nothing is saved until you press Save in Play Console yourself.
-
-⭐ CUSTOM APP SLUGS
-Map each app's name to your own short slug for use in the copied JSON, matching whatever naming scheme your team already uses.
-
-⭐ FULLY CUSTOMIZABLE
-Change any of the keyboard shortcuts and the parse-review modifier keys from the Options page. Changes save and apply instantly, no reload required.
-
-⭐ SAVED SHORTCUTS
-Bookmark any Play Console page from the popup — give it a name and it's one click away next time, from the popup, on any page.
-
-⭐ SETTINGS SYNC ACROSS DEVICES
-Your shortcuts, auto-translate toggle, app slugs, canned reply templates and saved bookmarks follow you to any other Chrome profile you're signed into, via Chrome's own sync — no account or setup needed.
+⭐ CUSTOMIZATION & SYNC
+Remap any keyboard shortcut or modifier key from Options, map app names to your own short slugs for the copied JSON, and bookmark any Play Console page for one-click access from the popup. Shortcuts, templates, slugs, and bookmarks all sync across your Chrome profiles automatically, no account needed.
 
 ⭐ PRIVATE BY DESIGN
-Everything runs locally against the Play Console page you're already on. No review content or reply text is ever sent anywhere — translation uses Chrome's on-device models, not a cloud service. The only thing stored is your own settings, in Chrome's built-in sync storage.
+Everything runs locally against the page you're already on. No review content or reply text is ever sent anywhere, and translation happens fully on-device. The only thing stored is your own settings, in Chrome's built-in sync storage.
 
 Homepage and docs: https://pcu.visnalize.com
 Source code: https://github.com/Visnalize/play-console-utils

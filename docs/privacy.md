@@ -1,13 +1,13 @@
 ---
 title: Privacy Policy
-description: How Play Console Utils handles your data - no analytics, no network requests, no review content or clipboard data ever leaving your device. Settings are stored only in Chrome's own sync storage.
+description: How ConsoleTurbo handles your data - no analytics, no network requests, no review content or clipboard data ever leaving your device. Settings are stored only in Chrome's own sync storage.
 ---
 
-# Privacy Policy for Play Console Utils
+# Privacy Policy for ConsoleTurbo
 
-**Last updated: 2026-08-01**
+**Last updated: 2026-08-03**
 
-Play Console Utils ("the extension") is a browser extension that adds productivity shortcuts to the Google Play Console. This policy explains what data it accesses and, most importantly, what it does not do with it.
+ConsoleTurbo ("the extension") is a browser extension that adds productivity shortcuts to the Google Play Console. This policy explains what data it accesses and, most importantly, what it does not do with it.
 
 ## Summary
 

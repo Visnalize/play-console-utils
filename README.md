@@ -1,4 +1,4 @@
-# Play Console Utils
+# ConsoleTurbo: Toolkit for Play Console
 
 A Chrome extension (Manifest V3, built with [WXT](https://wxt.dev)) that adds small productivity utilities and shortcuts to the [Google Play Console](https://play.google.com/console/).
 

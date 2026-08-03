@@ -111,7 +111,7 @@ export async function initQuickReply(ctx: ContentScriptContext) {
       try {
         translated = await translateReplyToReviewLanguage(active);
       } catch (error) {
-        console.warn('Play Console Utils: translation failed.', error);
+        console.warn('ConsoleTurbo: translation failed.', error);
         showToast('⚠️ Translation failed — publishing original text');
       }
     }
@@ -123,7 +123,7 @@ export async function initQuickReply(ctx: ContentScriptContext) {
     if (!publishBtn || isButtonDisabled(publishBtn)) {
       if (translated) {
         console.warn(
-          'Play Console Utils: reply was translated but the publish button never became available.',
+          'ConsoleTurbo: reply was translated but the publish button never became available.',
         );
         showToast('⚠️ Reply translated — click Publish manually to send it');
       }

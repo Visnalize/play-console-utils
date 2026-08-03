@@ -1,15 +1,15 @@
 ---
 layout: home
 title: Keyboard shortcuts for the Google Play Console
-description: Play Console Utils is a free Chrome extension for the Google Play Console. Publish review replies with one keyboard shortcut, auto-translate them on-device, insert canned reply templates, navigate reviews, set regional prices by purchasing power parity, and copy any review as JSON.
+description: ConsoleTurbo is a free Chrome extension for the Google Play Console. Publish review replies with one keyboard shortcut, auto-translate them on-device, insert canned reply templates, navigate reviews, set regional prices by purchasing power parity, and copy any review as JSON.
 
 hero:
-  name: Play Console Utils
+  name: ConsoleTurbo
   text: Handy utilities for your Google Play Console
   tagline: Reply faster with templates and auto-translation, navigate reviews, and copy review data as JSON - all from the keyboard.
   image:
     src: /icon.png
-    alt: Play Console Utils
+    alt: ConsoleTurbo
   actions:
     - theme: brand
       text: Add to Chrome

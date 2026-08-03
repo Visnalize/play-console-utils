@@ -2,9 +2,9 @@ import { readFileSync } from 'node:fs';
 import { defineConfig, type HeadConfig } from 'vitepress';
 
 const HOSTNAME = 'https://pcu.visnalize.com';
-const SITE_TITLE = 'Play Console Utils';
+const SITE_TITLE = 'ConsoleTurbo';
 const SITE_DESCRIPTION =
-  'A free Chrome extension that adds keyboard shortcuts to the Google Play Console: publish review replies instantly, auto-translate them on-device, insert canned reply templates, navigate reviews, and copy any review as JSON.';
+  'A free Chrome extension that adds keyboard shortcuts to the Google Play Console: publish review replies instantly, auto-translate them on-device, insert canned reply templates, navigate reviews, copy any review as JSON, and bulk-fill regional prices by purchasing power parity.';
 const WEB_STORE_URL =
   'https://chromewebstore.google.com/detail/nmhdlfiiadbnjnclabgonbapkmhkahkn';
 const REPO_URL = 'https://github.com/Visnalize/play-console-utils';

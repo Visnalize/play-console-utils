@@ -15,6 +15,6 @@ export default defineContentScript({
       initPicker(ctx),
       initNavigation(ctx),
     ]);
-    console.log('Play Console Utils: review shortcuts active.');
+    console.log('ConsoleTurbo: review shortcuts active.');
   },
 });

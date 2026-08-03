@@ -1,11 +1,11 @@
 ---
 title: Changelog
-description: Release notes for Play Console Utils - every version, what changed in it, and when it shipped.
+description: Release notes for ConsoleTurbo - every version, what changed in it, and when it shipped.
 ---
 
 # Changelog
 
-All notable changes to Play Console Utils are documented in this file.
+All notable changes to ConsoleTurbo are documented in this file.
 
 <!-- changelog-insert -->
 

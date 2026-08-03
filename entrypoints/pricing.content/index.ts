@@ -61,7 +61,7 @@ export default defineContentScript({
         try {
           sendResponse(scanPrices(message.basePrice, message.settings));
         } catch (err) {
-          console.error('Play Console Utils: price scan failed.', err);
+          console.error('ConsoleTurbo: price scan failed.', err);
           sendResponse({ scanned: 0, rows: [] });
         }
         return true;

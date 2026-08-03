@@ -18,7 +18,8 @@ export default defineConfig({
   // Firefox has no `sidePanel` permission (WXT maps the entrypoint to
   // `sidebar_action` there) and would flag it as unknown.
   manifest: ({ browser }) => ({
-    name: 'Play Console Utils',
+    name: 'ConsoleTurbo: Toolkit for Play Console',
+    short_name: 'ConsoleTurbo',
     description: 'Productivity utilities and shortcuts for Google Play Console',
     permissions: browser === 'firefox' ? ['storage'] : ['storage', 'sidePanel'],
     host_permissions: [CONSOLE_URL_MATCH_PATTERN],
