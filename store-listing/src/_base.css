@@ -1,0 +1,30 @@
+/* Shared design tokens for store-listing promo art (see docs/asset-src/og-1200x630.html for the OG-card sibling).
+   Not linked by any HTML file directly - each file inlines its own <style> since headless-Chrome
+   screenshotting works off a single self-contained file. Keep this in sync by hand. */
+
+:root {
+  --blue-1: #2f62d9;
+  --blue-2: #1f4dbe;
+  --blue-3: #163a99;
+  --ink: #1c2b4a;
+}
+
+body {
+  font-family: -apple-system, 'SF Pro Display', 'Inter', system-ui, sans-serif;
+  color: #fff;
+  background:
+    radial-gradient(
+      110% 90% at 12% -10%,
+      rgba(120, 165, 255, 0.55) 0%,
+      rgba(120, 165, 255, 0) 55%
+    ),
+    linear-gradient(135deg, var(--blue-1) 0%, var(--blue-2) 45%, var(--blue-3) 100%);
+}
+
+.dots {
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(rgba(255, 255, 255, 0.14) 1.5px, transparent 1.5px);
+  background-size: 26px 26px;
+  opacity: 0.5;
+}

@@ -16,7 +16,7 @@ Every shortcut below is the default and can be rebound from the Options page.
 
 ## Installation
 
-[![Available in the Chrome web store](https://developer.chrome.com/static/docs/webstore/branding/image/iNEddTyWiMfLSwFD6qGq.png)](https://chromewebstore.google.com/detail/play-console-utils/nmhdlfiiadbnjnclabgonbapkmhkahkn)
+[![Available in the Chrome web store](https://developer.chrome.com/static/docs/webstore/branding/image/iNEddTyWiMfLSwFD6qGq.png)](https://chromewebstore.google.com/detail/nmhdlfiiadbnjnclabgonbapkmhkahkn)
 
 Or install the extension manually following these steps:
 
@@ -63,13 +63,13 @@ pnpm ppp:refresh  # regenerate utils/ppp-data.ts from the World Bank API
 
 The `docs/` folder is a [VitePress](https://vitepress.dev) site — home page, privacy policy, and changelog — published to `https://pcu.visnalize.com`.
 
-All SEO metadata is generated in [`docs/.vitepress/config.ts`](docs/.vitepress/config.ts) (static tags in `head`; per-page canonical/Open Graph tags and the home page's JSON-LD in `transformPageData`), driven by each page's frontmatter `title`/`description` — so add both when adding a page. The social preview image (`docs/public/og.png`, 1200×630) is rendered from [`store-listing/og-1200x630.html`](store-listing/og-1200x630.html) with headless Chrome:
+All SEO metadata is generated in [`docs/.vitepress/config.ts`](docs/.vitepress/config.ts) (static tags in `head`; per-page canonical/Open Graph tags and the home page's JSON-LD in `transformPageData`), driven by each page's frontmatter `title`/`description` — so add both when adding a page. The social preview image (`docs/public/og.png`, 1200×630) is rendered from [`docs/asset-src/og-1200x630.html`](docs/asset-src/og-1200x630.html) with headless Chrome:
 
 ```sh
 # run from the repo root — Chrome needs an absolute file:// URL, not a relative path
 "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" --headless --hide-scrollbars \
   --window-size=1200,630 --force-device-scale-factor=1 \
-  --screenshot=docs/public/og.png "file://$PWD/store-listing/og-1200x630.html"
+  --screenshot=docs/public/og.png "file://$PWD/docs/asset-src/og-1200x630.html"
 ```
 
 ```sh
@@ -79,6 +79,19 @@ pnpm docs:preview  # preview the production build locally
 ```
 
 Pushing changes under `docs/` to `main` triggers [`.github/workflows/deploy-docs.yml`](.github/workflows/deploy-docs.yml), which builds the site and deploys it to GitHub Pages.
+
+## Store listing assets
+
+[`store-listing/`](store-listing/) holds the Chrome Web Store copy (`DESCRIPTION.txt`) and promo art. The three promo PNGs (`promo-marquee-1400x560.png`, `promo-screenshot-{1,2,3}-1280x800.png`, `promo-small-tile-440x280.png`) are each rendered from a same-named source file under [`store-listing/src/`](store-listing/src/) with headless Chrome, the same way as the docs site's OG image:
+
+```sh
+# run from the repo root — Chrome needs an absolute file:// URL, not a relative path
+"/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" --headless --hide-scrollbars \
+  --window-size=<W>,<H> --force-device-scale-factor=1 \
+  --screenshot=store-listing/<name>.png "file://$PWD/store-listing/src/<source>.html"
+```
+
+Each source file is a fully self-contained HTML/CSS mockup (no build step, no shared stylesheet import — headless Chrome screenshots one file at a time) of the extension's own UI, not a real screenshot; `store-listing/src/_base.css` documents the shared gradient/dots background and brand mark by hand since nothing actually `@import`s it. Update the mockup content when a promoted feature changes, and keep the three sizes' copy consistent with each other and with `DESCRIPTION.txt`.
 
 ## Releasing
 

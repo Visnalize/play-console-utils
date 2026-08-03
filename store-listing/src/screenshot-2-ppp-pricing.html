@@ -1,0 +1,334 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        width: 1280px;
+        height: 800px;
+      }
+      body {
+        position: relative;
+        overflow: hidden;
+        font-family:
+          -apple-system, 'SF Pro Display', 'Inter', system-ui, sans-serif;
+        color: #fff;
+        background:
+          radial-gradient(
+            110% 90% at 88% -10%,
+            rgba(120, 165, 255, 0.55) 0%,
+            rgba(120, 165, 255, 0) 55%
+          ),
+          linear-gradient(135deg, #2f62d9 0%, #1f4dbe 45%, #163a99 100%);
+      }
+      .dots {
+        position: absolute;
+        inset: 0;
+        background-image: radial-gradient(
+          rgba(255, 255, 255, 0.14) 1.5px,
+          transparent 1.5px
+        );
+        background-size: 26px 26px;
+        opacity: 0.5;
+      }
+      .wrap {
+        position: relative;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        padding: 0 76px;
+        gap: 64px;
+      }
+      .left {
+        flex: 1;
+        max-width: 540px;
+      }
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        margin-bottom: 28px;
+      }
+      .badge {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        background: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 8px 24px rgba(9, 32, 84, 0.28);
+      }
+      .badge svg {
+        width: 27px;
+        height: 27px;
+      }
+      .brand span {
+        font-size: 28px;
+        font-weight: 700;
+        letter-spacing: -0.01em;
+      }
+      h1 {
+        font-size: 46px;
+        line-height: 1.1;
+        font-weight: 800;
+        letter-spacing: -0.02em;
+      }
+      .sub {
+        margin-top: 18px;
+        font-size: 19px;
+        line-height: 1.55;
+        color: rgba(255, 255, 255, 0.86);
+      }
+      .bullets {
+        margin-top: 34px;
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+      }
+      .bullet {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        font-size: 18px;
+        font-weight: 600;
+      }
+      .bullet-icon {
+        width: 34px;
+        height: 34px;
+        border-radius: 10px;
+        background: rgba(255, 255, 255, 0.16);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        font-size: 17px;
+      }
+      /* --- panel mockup --- */
+      .panel {
+        width: 400px;
+        flex-shrink: 0;
+        background: #fff;
+        border-radius: 20px;
+        box-shadow: 0 30px 70px rgba(8, 25, 70, 0.35);
+        padding: 24px 24px 22px;
+        color: #1c2b4a;
+      }
+      .panel-title {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 17px;
+        font-weight: 700;
+      }
+      .field-label {
+        margin-top: 18px;
+        font-size: 12.5px;
+        font-weight: 600;
+        color: #8892a6;
+      }
+      .field {
+        margin-top: 6px;
+        border: 1.5px solid #e3e7f0;
+        border-radius: 10px;
+        padding: 10px 12px;
+        font-size: 15px;
+        font-weight: 600;
+        color: #1c2b4a;
+      }
+      .slider-row {
+        margin-top: 16px;
+      }
+      .slider-track {
+        margin-top: 8px;
+        height: 6px;
+        border-radius: 999px;
+        background: #e3e7f0;
+        position: relative;
+      }
+      .slider-fill {
+        position: absolute;
+        inset: 0 62% 0 0;
+        border-radius: 999px;
+        background: #2f62d9;
+      }
+      .slider-thumb {
+        position: absolute;
+        left: 38%;
+        top: 50%;
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+        background: #fff;
+        border: 3px solid #2f62d9;
+        transform: translate(-50%, -50%);
+        box-shadow: 0 2px 6px rgba(8, 25, 70, 0.25);
+      }
+      .preview-head {
+        margin-top: 20px;
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+      }
+      .preview-label {
+        font-size: 11.5px;
+        font-weight: 700;
+        letter-spacing: 0.04em;
+        color: #8892a6;
+      }
+      .preview-matched {
+        font-size: 12px;
+        color: #8892a6;
+      }
+      .rows {
+        margin-top: 8px;
+        border-top: 1px solid #eef1f7;
+      }
+      .row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 10px 0;
+        border-bottom: 1px solid #eef1f7;
+      }
+      .row-country {
+        font-size: 14.5px;
+        font-weight: 600;
+      }
+      .row-was {
+        font-size: 12px;
+        color: #9aa3b5;
+        margin-top: 1px;
+      }
+      .row-price {
+        text-align: right;
+        font-size: 14.5px;
+        font-weight: 700;
+      }
+      .row-pct {
+        font-size: 12px;
+        font-weight: 700;
+        color: #d84343;
+        margin-top: 1px;
+      }
+      .fill-btn {
+        margin-top: 18px;
+        text-align: center;
+        background: #2f62d9;
+        color: #fff;
+        font-weight: 700;
+        font-size: 15px;
+        padding: 13px;
+        border-radius: 12px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="dots"></div>
+    <div class="wrap">
+      <div class="left">
+        <div class="brand">
+          <div class="badge">
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="#1f4dbe"
+              stroke-width="3.4"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M4 12.5 L9.5 18 L20 6.5" />
+            </svg>
+          </div>
+          <span>ConsoleTurbo</span>
+        </div>
+        <h1>Price every market in one pass</h1>
+        <p class="sub">
+          Enter one base price - ConsoleTurbo converts it for every market at
+          purchasing power parity and fills them all in for you.
+        </p>
+        <div class="bullets">
+          <div class="bullet">
+            <div class="bullet-icon">&#127760;</div>
+            World Bank data for 200+ countries, built in
+          </div>
+          <div class="bullet">
+            <div class="bullet-icon">&#128176;</div>
+            Handles markets billed in USD/EUR correctly
+          </div>
+          <div class="bullet">
+            <div class="bullet-icon">&#9199;</div>
+            Live progress and a Stop button mid-fill
+          </div>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="panel-title">&#127760; PPP pricing</div>
+        <div class="field-label">Base price &mdash; United States (USD)</div>
+        <div class="field">40</div>
+        <div class="slider-row">
+          <div class="field-label" style="margin-top: 0">
+            Custom factor &middot; Raw PPP
+          </div>
+          <div class="slider-track">
+            <div class="slider-fill"></div>
+            <div class="slider-thumb"></div>
+          </div>
+        </div>
+        <div class="preview-head">
+          <div class="preview-label">PREVIEW</div>
+          <div class="preview-matched">Matched 171 of 173 rows</div>
+        </div>
+        <div class="rows">
+          <div class="row">
+            <div>
+              <div class="row-country">Albania</div>
+              <div class="row-was">was USD 47.99</div>
+            </div>
+            <div>
+              <div class="row-price">USD 16.99</div>
+              <div class="row-pct">&darr; 65%</div>
+            </div>
+          </div>
+          <div class="row">
+            <div>
+              <div class="row-country">Algeria</div>
+              <div class="row-was">was DZD 5175.00</div>
+            </div>
+            <div>
+              <div class="row-price">DZD 1700.00</div>
+              <div class="row-pct">&darr; 67%</div>
+            </div>
+          </div>
+          <div class="row">
+            <div>
+              <div class="row-country">Angola</div>
+              <div class="row-was">was USD 39.99</div>
+            </div>
+            <div>
+              <div class="row-price">USD 13.99</div>
+              <div class="row-pct">&darr; 65%</div>
+            </div>
+          </div>
+          <div class="row" style="border-bottom: none">
+            <div>
+              <div class="row-country">Australia</div>
+              <div class="row-was">was AUD 62.99</div>
+            </div>
+            <div>
+              <div class="row-price">AUD 55.99</div>
+              <div class="row-pct">&darr; 11%</div>
+            </div>
+          </div>
+        </div>
+        <div class="fill-btn">Fill prices</div>
+      </div>
+    </div>
+  </body>
+</html>
