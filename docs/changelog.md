@@ -9,6 +9,15 @@ All notable changes to ConsoleTurbo are documented in this file.
 
 <!-- changelog-insert -->
 
+## [1.3.1] - 2026-08-03
+
+- fix: update store listing and assets after rebrand (5af6d6b)
+- fix: rebrand Play Console Utils to ConsoleTurbo (07c913f)
+- fix: don't let PPP custom factor scale the base market itself (8509cb1)
+
+**Full Changelog**: https://github.com/Visnalize/play-console-utils/compare/v1.3.0...v1.3.1
+
+
 ## [1.3.0] - 2026-08-01
 
 - refactor: PPP pricing panel UI (54507b6)
